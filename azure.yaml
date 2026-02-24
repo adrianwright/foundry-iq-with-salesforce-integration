@@ -1,0 +1,74 @@
+# Azure Developer CLI (azd) configuration
+# Run `azd provision` to deploy infrastructure
+
+name: nimbus-helpdesk-demo
+metadata:
+  template: nimbus-helpdesk-demo@0.0.1
+
+# Infrastructure configuration
+infra:
+  provider: bicep
+  path: infra
+
+# Hooks — automatically load .env into azd environment before provisioning
+hooks:
+  preprovision:
+    shell: pwsh
+    run: |
+      $ErrorActionPreference = 'SilentlyContinue'
+      if (Test-Path .env) {
+        Write-Host "Loading .env into azd environment..."
+        Get-Content .env | ForEach-Object {
+          if ($_ -match '^\s*([A-Z_][A-Z0-9_]*)\s*=\s*(.+)$') {
+            $key = $matches[1]
+            $val = $matches[2].Trim()
+            azd env set $key $val 2>&1 | Out-Null
+            Write-Host "  Set $key"
+          }
+        }
+      } else {
+        Write-Host "No .env file found — set SFDC credentials manually via 'azd env set'"
+      }
+  postprovision:
+    shell: pwsh
+    run: |
+      Write-Host "Updating .env with Azure resource endpoints..."
+      $envFile = '.env'
+      $existing = @{}
+      if (Test-Path $envFile) {
+        Get-Content $envFile | ForEach-Object {
+          if ($_ -match '^\s*([A-Z_][A-Z0-9_]*)\s*=\s*(.*)$') {
+            $existing[$matches[1]] = $matches[2].Trim()
+          }
+        }
+      }
+      # Map azd outputs to .env keys
+      $azureKeys = @(
+        'AZURE_AI_PROJECT_ENDPOINT',
+        'AZURE_OPENAI_ENDPOINT',
+        'AZURE_OPENAI_DEPLOYMENT',
+        'AZURE_SEARCH_ENDPOINT'
+      )
+      foreach ($key in $azureKeys) {
+        $val = azd env get-value $key 2>$null
+        if ($val) {
+          $existing[$key] = $val
+          Write-Host "  Set $key"
+        }
+      }
+      # Write back .env preserving SFDC creds + Azure values
+      $lines = @()
+      $sfdcKeys = @('SFDC_CLIENT_ID', 'SFDC_CLIENT_SECRET', 'SALESFORCE_TOKEN_ENDPOINT')
+      foreach ($k in $sfdcKeys) {
+        if ($existing.ContainsKey($k)) { $lines += "$k=$($existing[$k])" }
+      }
+      $lines += ''
+      $lines += '# Azure AI Foundry'
+      foreach ($k in @('AZURE_AI_PROJECT_ENDPOINT', 'AZURE_OPENAI_ENDPOINT', 'AZURE_OPENAI_DEPLOYMENT')) {
+        if ($existing.ContainsKey($k)) { $lines += "$k=$($existing[$k])" }
+      }
+      $lines += ''
+      $lines += '# Azure AI Search'
+      if ($existing.ContainsKey('AZURE_SEARCH_ENDPOINT')) { $lines += "AZURE_SEARCH_ENDPOINT=$($existing['AZURE_SEARCH_ENDPOINT'])" }
+      $lines | Set-Content $envFile -Encoding utf8NoBOM
+      Write-Host ".env updated successfully."

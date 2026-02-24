@@ -1,0 +1,42 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "environmentName": {
+      "value": "${AZURE_ENV_NAME}"
+    },
+    "location": {
+      "value": "${AZURE_LOCATION}"
+    },
+    "principalId": {
+      "value": "${AZURE_PRINCIPAL_ID}"
+    },
+    "aiSearchSku": {
+      "value": "basic"
+    },
+    "modelName": {
+      "value": "gpt-5.2"
+    },
+    "modelFormat": {
+      "value": "OpenAI"
+    },
+    "modelVersion": {
+      "value": "2025-12-11"
+    },
+    "modelSkuName": {
+      "value": "GlobalStandard"
+    },
+    "modelCapacity": {
+      "value": 30
+    },
+    "salesforceClientId": {
+      "value": "${SFDC_CLIENT_ID}"
+    },
+    "salesforceClientSecret": {
+      "value": "${SFDC_CLIENT_SECRET}"
+    },
+    "salesforceTokenEndpoint": {
+      "value": "${SALESFORCE_TOKEN_ENDPOINT}"
+    }
+  }
+}

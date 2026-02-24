@@ -1,0 +1,10 @@
+{
+  "resourceGroup": "rg-",
+  "storageAccount": "st",
+  "logAnalytics": "log-",
+  "appInsights": "appi-",
+  "cognitiveServices": "cog-",
+  "searchService": "srch-",
+  "keyVault": "kv-",
+  "logicApp": "logic-"
+}
