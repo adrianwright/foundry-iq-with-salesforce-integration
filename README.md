@@ -1,6 +1,6 @@
-# Setup Guide
+# Foundry IQ — AI-Powered IT Helpdesk with Salesforce Integration
 
-End-to-end instructions for deploying the NimbusCloud IT Helpdesk AI demo. **NimbusCloud is a fictitious SaaS company** used as the scenario for this demo — all products, support cases, and knowledge articles are synthetic. The system uses Azure AI Foundry agents grounded on a knowledge base in Azure AI Search, with APIM exposing an MCP server for Salesforce case management, and Logic Apps syncing data between Salesforce and AI Search.
+A demo showing how **Azure AI Foundry agents** integrate with **Salesforce** to power an intelligent IT helpdesk. An AI agent (Foundry IQ) assists support engineers by searching a knowledge base in Azure AI Search and managing Salesforce cases through an APIM-hosted MCP server. **NimbusCloud is a fictitious SaaS company** used as the scenario — all products, support cases, and knowledge articles are synthetic.
 
 ## Architecture Overview
 
