@@ -68,10 +68,6 @@ Open `.env` and set the three Salesforce fields:
 
 > **Token Endpoint format:** For developer orgs this is typically something like `https://orgfarm-xxxxx-dev-ed.develop.my.salesforce.com/services/oauth2/token`
 
-> **Note:** `.env` is in `.gitignore` and will not be committed. The `.env.template` file is the source-controlled reference.
-
-The `azd provision` command (Step 2) will automatically load these values from `.env` via a preprovision hook — no manual `azd env set` required.
-
 ---
 
 ## Step 2 — Deploy Azure Infrastructure
@@ -82,7 +78,6 @@ The deployment stores your Salesforce credentials (from Step 1) in Key Vault and
 
 > **Note:** The initial deployment can take **~45 minutes**, primarily due to the APIM Developer-tier instance provisioning.
 
-### Option A: Azure Developer CLI (recommended)
 
 ```bash
 azd auth login
@@ -113,7 +108,7 @@ The Bicep templates create most RBAC assignments automatically. If you hit permi
 
 ## Step 3 — Load Data into AI Search
 
-Three Python scripts populate the AI Search indexes from the markdown files in this repo. Each script creates its index if it doesn't exist.
+The loader script assigns required RBAC roles and populates all three AI Search indexes (`helpdesk-knowledge`, `community-forum-posts`, `service-cases`) from the markdown files in this repo.
 
 ### Install dependencies
 
@@ -129,48 +124,13 @@ The scripts use `DefaultAzureCredential`, so make sure you're logged in:
 az login
 ```
 
-### Set environment variables
-
-Create a `.env` file in the repo root (or export these):
-
-```env
-AZURE_OPENAI_ENDPOINT=https://<your-foundry-resource>.openai.azure.com/
-AZURE_SEARCH_ENDPOINT=https://<your-search-service>.search.windows.net
-```
-
-### Load knowledge base articles
-
-Reads every `KB/*.md` file, generates embeddings via the `text-embedding-3-small` model deployment, and upserts into the `helpdesk-knowledge` index.
-
-```bash
-python scripts/load_knowledge_base.py
-```
-
-### Load community forum posts
-
-Same process for `forums/*.md` → `community-forum-posts` index.
-
-```bash
-python scripts/load_forum_posts.py
-```
-
-### Load service cases
-
-Same process for `cases/*.md` → `service-cases` index.
-
-```bash
-python scripts/load_cases.py
-```
-
-### One-step alternative
-
-The PowerShell script `scripts/load-search-data.ps1` assigns required RBAC roles and runs all three loaders:
+### Run the loader
 
 ```powershell
 .\scripts\load-search-data.ps1
 ```
 
-> **Tip:** Re-run these scripts any time you update the markdown content. They are idempotent — documents are upserted by ID.
+> **Tip:** Re-run this script any time you update the markdown content. Documents are upserted by ID.
 
 ---
 
@@ -257,13 +217,6 @@ Once authorized, the Logic Apps will:
 2. Check the Logic App run history in the Azure Portal to confirm it fired
 3. Query the AI Search index to see the new document
 
-### Validate Salesforce credentials
-
-```bash
-python scripts/check_sf_limits.py
-```
-
-This authenticates against Salesforce and prints your API usage limits. If it succeeds, your credentials are working.
 
 ---
 
@@ -282,23 +235,3 @@ With everything connected, run through the demo scenarios:
    - Successfully creates Salesforce cases via the MCP tool
 
 ---
-
-## Environment Variables Reference
-
-| Variable | Used by | Description |
-|----------|---------|-------------|
-| `AZURE_OPENAI_ENDPOINT` | `load_knowledge_base.py`, `load_forum_posts.py`, `load_cases.py` | AI Foundry / OpenAI endpoint for embeddings |
-| `AZURE_SEARCH_ENDPOINT` | `load_knowledge_base.py`, `load_forum_posts.py`, `load_cases.py` | AI Search service endpoint |
-| `SFDC_CLIENT_ID` | `create_case.py`, `check_sf_limits.py` | Salesforce Connected App consumer key |
-| `SFDC_CLIENT_SECRET` | Same as above | Salesforce Connected App consumer secret |
-
-## Scripts Reference
-
-| Script | Purpose |
-|--------|---------|
-| `load-search-data.ps1` | Assign RBAC roles + run all three AI Search loaders |
-| `load_knowledge_base.py` | Load `KB/*.md` → AI Search `helpdesk-knowledge` index |
-| `load_forum_posts.py` | Load `forums/*.md` → AI Search `community-forum-posts` index |
-| `load_cases.py` | Load `cases/*.md` → AI Search `service-cases` index (supports `--dry-run`) |
-| `create_case.py` | Create a single Salesforce Case (`--subject`, `--description`, `--priority`) |
-| `check_sf_limits.py` | Check Salesforce API usage limits (good for validating credentials) |
