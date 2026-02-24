@@ -1,6 +1,18 @@
 # Setup Guide
 
-End-to-end instructions for deploying the NimbusCloud IT Helpdesk AI demo. The system uses Azure AI Foundry agents grounded on a knowledge base in Azure AI Search, with APIM exposing an MCP server for Salesforce case management, and Logic Apps syncing data between Salesforce and AI Search.
+End-to-end instructions for deploying the NimbusCloud IT Helpdesk AI demo. **NimbusCloud is a fictitious SaaS company** used as the scenario for this demo — all products, support cases, and knowledge articles are synthetic. The system uses Azure AI Foundry agents grounded on a knowledge base in Azure AI Search, with APIM exposing an MCP server for Salesforce case management, and Logic Apps syncing data between Salesforce and AI Search.
+
+## Architecture Overview
+
+The solution has two main data flows:
+
+**Salesforce ↔ AI Search sync** — A Logic App listens for case changes in Salesforce and keeps the Azure AI Search index up to date so the agent always has current information.
+
+![Salesforce to AI Search sync architecture](img/sync-to-search.png)
+
+**Agent chat** — Users interact with an Azure AI Foundry agent that is grounded on the AI Search knowledge base. When the agent needs to create or update a Salesforce case, it calls tools exposed through an APIM-hosted MCP server that authenticates to Salesforce via OAuth client credentials.
+
+![Agent chat architecture](img/chat.png)
 
 ## Prerequisites
 
