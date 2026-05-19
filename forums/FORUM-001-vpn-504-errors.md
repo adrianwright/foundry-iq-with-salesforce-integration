@@ -2,15 +2,15 @@
 
 **Article Number**: FORUM-001  
 **Category**: Network & Connectivity  
-**Product**: NimbusCloud Platform
+**Product**: ZavaCloud Platform
 
 ---
 
-## Thread: VPN connection keeps timing out when accessing NimbusCloud — 504 errors
+## Thread: VPN connection keeps timing out when accessing ZavaCloud — 504 errors
 
 **Posted by:** @MarcusR_IT | January 20, 2026
 
-We're onboarding 12 new hires this week and they're all getting 504 Gateway Timeout errors when trying to access NimbusCloud while on our corporate VPN (GlobalProtect). It works fine from the office without VPN. Is anyone else seeing this? We need to get these folks set up ASAP — MFA enrollment is stuck because the pages won't load.
+We're onboarding 12 new hires this week and they're all getting 504 Gateway Timeout errors when trying to access ZavaCloud while on our corporate VPN (GlobalProtect). It works fine from the office without VPN. Is anyone else seeing this? We need to get these folks set up ASAP — MFA enrollment is stuck because the pages won't load.
 
 ---
 
@@ -18,9 +18,9 @@ We're onboarding 12 new hires this week and they're all getting 504 Gateway Time
 
 **Posted by:** @NetAdmin_Jake | January 20, 2026
 
-We had the exact same issue when we rolled out NimbusCloud last quarter. The problem was our VPN routing — we had a full-tunnel config that was sending ALL traffic through the VPN, including NimbusCloud SaaS endpoints.
+We had the exact same issue when we rolled out ZavaCloud last quarter. The problem was our VPN routing — we had a full-tunnel config that was sending ALL traffic through the VPN, including ZavaCloud SaaS endpoints.
 
-Fix: Update your split-tunnel policy to exclude `*.nimbuscloud.io`. NimbusCloud's SaaS endpoints don't need VPN — they're public internet services. Only `*.internal.nimbuscloud.io` (NimbusAdmin private endpoints) should go through the tunnel.
+Fix: Update your split-tunnel policy to exclude `*.ZavaCloud.io`. ZavaCloud's SaaS endpoints don't need VPN — they're public internet services. Only `*.internal.ZavaCloud.io` (ZavaAdmin private endpoints) should go through the tunnel.
 
 After that change, our 504s dropped to zero.
 
@@ -68,7 +68,7 @@ sudo killall -HUP mDNSResponder
 
 Or better yet, create a script that runs automatically when the VPN connects. You can hook into the GlobalProtect post-connect script to do this.
 
-We also added `internal.nimbuscloud.io` to the DNS suffix search list in our network profile to fix resolution for NimbusAdmin endpoints.
+We also added `internal.ZavaCloud.io` to the DNS suffix search list in our network profile to fix resolution for ZavaAdmin endpoints.
 
 ---
 
@@ -78,10 +78,10 @@ We also added `internal.nimbuscloud.io` to the DNS suffix search list in our net
 
 That did it — all 12 new hires are now set up. Here's the complete fix for anyone finding this later:
 
-1. **Split-tunnel VPN** — exclude `*.nimbuscloud.io` SaaS endpoints
+1. **Split-tunnel VPN** — exclude `*.ZavaCloud.io` SaaS endpoints
 2. **MTU 1400** on VPN adapter
 3. **macOS DNS fix** — restart mDNSResponder after VPN connection
-4. **DNS suffix** — add `internal.nimbuscloud.io` for admin access
+4. **DNS suffix** — add `internal.ZavaCloud.io` for admin access
 
 Opened a support case (CASE-001) that confirmed the same steps. KB-001 has the full VPN troubleshooting guide.
 
@@ -91,7 +91,7 @@ Opened a support case (CASE-001) that confirmed the same steps. KB-001 has the f
 
 **Posted by:** @NewAdmin_Sam | January 25, 2026
 
-Saving this thread — we're about to deploy NimbusCloud next month and I know we'll hit this. Quick question: does NimbusConnect video traffic also need to be excluded from the VPN tunnel? Our security team wants to keep as much in the tunnel as possible.
+Saving this thread — we're about to deploy ZavaCloud next month and I know we'll hit this. Quick question: does ZavaConnect video traffic also need to be excluded from the VPN tunnel? Our security team wants to keep as much in the tunnel as possible.
 
 ---
 
@@ -99,4 +99,4 @@ Saving this thread — we're about to deploy NimbusCloud next month and I know w
 
 **Posted by:** @NetAdmin_Jake | January 25, 2026
 
-@NewAdmin_Sam Absolutely exclude NimbusConnect from the VPN tunnel. Video conferencing latency is brutal through a full-tunnel VPN — you'll get choppy audio and pixelated video. NimbusConnect uses WebRTC with UDP and adding VPN overhead kills the experience. Check KB-002 for the NimbusConnect firewall/network requirements.
+@NewAdmin_Sam Absolutely exclude ZavaConnect from the VPN tunnel. Video conferencing latency is brutal through a full-tunnel VPN — you'll get choppy audio and pixelated video. ZavaConnect uses WebRTC with UDP and adding VPN overhead kills the experience. Check KB-002 for the ZavaConnect firewall/network requirements.

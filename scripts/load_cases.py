@@ -84,10 +84,7 @@ def create_or_update_index(credential):
 
     vector_search = VectorSearch(
         algorithms=[
-            HnswAlgorithmConfiguration(
-                name="hnsw-algorithm",
-                parameters={"metric": "cosine", "m": 4, "ef_construction": 400, "ef_search": 500},
-            )
+            HnswAlgorithmConfiguration(name="hnsw-algorithm")
         ],
         profiles=[
             VectorSearchProfile(
@@ -286,7 +283,7 @@ def main():
     args = parser.parse_args()
 
     print("=" * 60)
-    print("NimbusCloud Demo — Service Case Pre-Loader")
+    print("ZavaCloud Demo — Service Case Pre-Loader")
     print("=" * 60)
     print(f"OpenAI Endpoint: {AZURE_OPENAI_ENDPOINT}")
     print(f"Search Endpoint: {AZURE_SEARCH_ENDPOINT}")

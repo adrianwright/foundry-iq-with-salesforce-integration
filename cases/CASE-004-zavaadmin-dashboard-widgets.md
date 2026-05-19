@@ -1,9 +1,9 @@
-# Support Case: NimbusAdmin Dashboard Widgets Not Loading
+# Support Case: ZavaAdmin Dashboard Widgets Not Loading
 
 **Case Number**: CASE-004  
 **Status**: Resolved  
 **Priority**: Medium  
-**Product**: NimbusAdmin  
+**Product**: ZavaAdmin  
 **Category**: Admin Console  
 **Origin**: Web  
 **Contact**: Lisa Park, IT Director, Summit Healthcare Group  
@@ -14,10 +14,10 @@
 ---
 
 ## Subject
-NimbusAdmin analytics dashboard showing blank widgets and "Data unavailable" errors
+ZavaAdmin analytics dashboard showing blank widgets and "Data unavailable" errors
 
 ## Description
-Lisa Park reported that the NimbusAdmin analytics dashboard has been showing blank widgets for the past 3 days. The user activity charts, license utilization graph, and login trend widget all display "Data unavailable." The issue affects all admin users at Summit Healthcare Group, not just Lisa's account.
+Lisa Park reported that the ZavaAdmin analytics dashboard has been showing blank widgets for the past 3 days. The user activity charts, license utilization graph, and login trend widget all display "Data unavailable." The issue affects all admin users at Summit Healthcare Group, not just Lisa's account.
 
 ## Investigation Notes
 
@@ -25,7 +25,7 @@ Lisa Park reported that the NimbusAdmin analytics dashboard has been showing bla
 - Confirmed blank dashboard across 3 admin accounts at Summit Healthcare Group
 - Tenant was provisioned 5 days ago — within the 24-hour initial data pipeline window, but past it
 - Checked analytics pipeline status — data pipeline shows "Healthy" for this tenant
-- Browser console shows 403 errors when loading dashboard widgets from `analytics.internal.nimbuscloud.io`
+- Browser console shows 403 errors when loading dashboard widgets from `analytics.internal.ZavaCloud.io`
 - Root cause identified: Admin users have the "Tenant Admin" role but not the "Analytics Viewer" role — these are separate permissions
 
 **2026-02-02 — Fix Applied**
@@ -42,5 +42,5 @@ Lisa Park reported that the NimbusAdmin analytics dashboard has been showing bla
 Admin users were missing the "Analytics Viewer" role, which is separate from "Tenant Admin." Adding the role immediately restored dashboard widget access. KB-004 documents required admin roles.
 
 ## Related Articles
-- KB-004: NimbusAdmin Tenant and User Provisioning
-- FORUM-004: NimbusAdmin Analytics Dashboard Tips
+- KB-004: ZavaAdmin Tenant and User Provisioning
+- FORUM-004: ZavaAdmin Analytics Dashboard Tips

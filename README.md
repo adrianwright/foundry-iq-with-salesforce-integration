@@ -1,6 +1,6 @@
 # Foundry IQ — AI-Powered IT Helpdesk with Salesforce Integration
 
-A demo showing how **Azure AI Foundry agents** integrate with **Salesforce** to power an intelligent IT helpdesk. An AI agent (Foundry IQ) assists support engineers by searching a knowledge base in Azure AI Search and managing Salesforce cases through an APIM-hosted MCP server. **NimbusCloud is a fictitious SaaS company** used as the scenario — all products, support cases, and knowledge articles are synthetic.
+A demo showing how **Azure AI Foundry agents** integrate with **Salesforce** to power an intelligent IT helpdesk. An AI agent (Foundry IQ) assists support engineers by searching a knowledge base in Azure AI Search and managing Salesforce cases through an APIM-hosted MCP server. **ZavaCloud is a fictitious SaaS company** used as the scenario — all products, support cases, and knowledge articles are synthetic.
 
 ## Architecture Overview
 
@@ -45,10 +45,16 @@ The APIM policy and Python scripts use the OAuth 2.0 **client_credentials** flow
 1. In Salesforce Setup, go to **App Manager** → **New Connected App**
 2. Enable **OAuth Settings**:
    - Callback URL: `https://login.salesforce.com/services/oauth2/callback`
-   - Scopes: `api`, `refresh_token`
+   - Scopes: `api`, `refresh_token`, `Full access (full)`
 3. Save and note the **Consumer Key** (client ID) and **Consumer Secret**
 4. Under **Manage** → **Edit Policies**, set "Permitted Users" to **Admin approved users are pre-authorized**
 5. Assign a Permission Set or Profile to authorize the Connected App
+6. **Enable the Client Credentials Flow** and set a **Run As** user. The Run-As user **must have the `API Enabled` system permission** — an out-of-the-box Agentforce-license user does not. Use an integration/admin user with API access, or assign a permission set granting `API Enabled`.
+
+> **Verify the token endpoint works** before deploying — most failures here surface as `invalid_grant: no valid scopes defined`, which means the Run-As user lacks API access:
+> ```pwsh
+> curl -X POST "$env:SALESFORCE_TOKEN_ENDPOINT" -d "grant_type=client_credentials&client_id=$env:SFDC_CLIENT_ID&client_secret=$env:SFDC_CLIENT_SECRET"
+> ```
 
 ### Record your credentials
 
@@ -88,6 +94,8 @@ azd provision                     # loads .env automatically, provisions infrast
 
 > The preprovision hook in `azure.yaml` reads your `.env` file and sets `SFDC_CLIENT_ID`, `SFDC_CLIENT_SECRET`, and `SALESFORCE_TOKEN_ENDPOINT` in the azd environment. These are passed to the Bicep templates as secure parameters and stored in Key Vault.
 
+> **Heads-up:** Most resources (AI Search, AI Services, Logic Apps, storage) provision in the first ~5 minutes. The remaining ~40 minutes is APIM Developer-tier. The **Key Vault (`<env>-apim-kv`) is created as part of the APIM module**, so it won't exist in your resource group until APIM finishes. The `postprovision` hook is what writes the endpoint outputs into `.env` — **do not run the loader or agent scripts in Step 3+ until `azd provision` exits successfully**.
+
 ### Post-deployment outputs
 
 After provisioning, note these values (available via `azd env get-values`):
@@ -99,10 +107,20 @@ After provisioning, note these values (available via `azd env get-values`):
 | `AZURE_SEARCH_INDEX` | Knowledge base index name (`helpdesk-knowledge`) |
 | `AZURE_APIM_ENDPOINT` | APIM gateway URL |
 | `AZURE_KEYVAULT_NAME` | Key Vault for Salesforce credentials |
+| `AZURE_RESOURCE_GROUP` | Resource group hosting all deployed resources |
 
 ### Role assignments
 
-The Bicep templates create most RBAC assignments automatically. If you hit permission errors later, `infra/assign-roles.ps1` is a reference script that creates all required role assignments via CLI. **Edit the hardcoded resource group, subscription ID, and resource names at the top of the file before running it.**
+The Bicep templates create most RBAC assignments automatically. The loader script in Step 3 additionally grants the **deploying user** the roles needed to read/write the Search indexes and call the AI Services data plane:
+
+- `Search Service Contributor` + `Search Index Data Contributor` on the Search service
+- `Cognitive Services OpenAI User` + `Cognitive Services User` + `Azure AI Developer` on the AI Services account
+
+> **Why three Cognitive roles?** The Bicep deploys an `AIServices`-kind account (not pure `OpenAI`). On AI Services accounts, `Cognitive Services OpenAI User` alone returns `401 PermissionDenied` on `/embeddings`. All three roles together cover the data-plane actions.
+>
+> **RBAC propagation** to the AI Services data plane often takes 2–3 minutes after assignment, so the loader sleeps 180s before calling the embedding API. If you ever see `PermissionDenied` from `client.embeddings.create`, wait another minute and re-run.
+
+If you hit permission errors later, `infra/assign-roles.ps1` is a reference script that creates all required role assignments via CLI. **Edit the hardcoded resource group, subscription ID, and resource names at the top of the file before running it.**
 
 ---
 
@@ -142,9 +160,9 @@ This connects AI Foundry to the AI Search indexes so agents can retrieve grounde
 2. In the left nav, click **Knowledge** and connect to your AI Search instance
 3. Click **Create a knowledge base**
 4. Choose the type **AI Search Index**
-5. Select one of the three indexes created with the test data (`helpdesk-knowledge`, `community-forum-posts`, or `service-cases`) and give the knowledge base a name (e.g., `nimbuscloud-helpdesk-kb`)
+5. Select one of the three indexes created with the test data (`helpdesk-knowledge`, `community-forum-posts`, or `service-cases`) and give the knowledge base a name (e.g., `ZavaCloud-helpdesk-kb`)
 6. Within the same knowledge base, click **+ New knowledge source** and add the other two indexes — you should now have a single knowledge base with three knowledge sources
-7. Choose gpt-4.1 for the chat completion model
+7. Choose gpt-5.4 for the chat completion model
 8. Set reasoning level to Medium.
 9. Click Save Knowledge base.
 
@@ -227,8 +245,8 @@ With everything connected, run through the demo scenarios:
 1. Open [Azure AI Foundry](https://ai.azure.com) → your project → **Agents**
 2. Select your agent and open the **Chat** playground
 3. Try prompts from `DEMO_PROMPTS.md`, for example:
-   - _"We're seeing intermittent timeouts when NimbusHub tries to sync grades to the SIS. What should we check?"_
-   - _"Create a P2 case for the NimbusConnect audio issues in virtual classrooms"_
+   - _"We're seeing intermittent timeouts when ZavaHub tries to sync grades to the SIS. What should we check?"_
+   - _"Create a P2 case for the ZavaConnect audio issues in virtual classrooms"_
 4. Verify the agent:
    - Retrieves relevant KB articles and forum discussions
    - Cites sources in its answers

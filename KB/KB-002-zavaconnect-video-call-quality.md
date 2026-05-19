@@ -1,13 +1,13 @@
-# NimbusConnect Video Call Quality Troubleshooting
+# ZavaConnect Video Call Quality Troubleshooting
 
 **Article Number:** KB-002  
-**Product:** NimbusConnect  
+**Product:** ZavaConnect  
 **Category:** Audio & Video  
 **Last Updated:** February 2026
 
 ## Overview
 
-NimbusConnect is NimbusCloud's video conferencing and virtual meeting platform. This article covers common audio and video quality issues including echo, dropped audio, pixelated video, and connection failures. NimbusConnect uses WebRTC for peer-to-peer media and falls back to a relay server (TURN) when direct connections are blocked.
+ZavaConnect is ZavaCloud's video conferencing and virtual meeting platform. This article covers common audio and video quality issues including echo, dropped audio, pixelated video, and connection failures. ZavaConnect uses WebRTC for peer-to-peer media and falls back to a relay server (TURN) when direct connections are blocked.
 
 ## System Requirements
 
@@ -40,7 +40,7 @@ NimbusConnect is NimbusCloud's video conferencing and virtual meeting platform. 
 1. Use headphones or a headset — this eliminates 90% of echo issues
 2. Check for duplicate meeting connections (multiple tabs or devices)
 3. Mute when not speaking, especially in large meetings
-4. Enable echo cancellation: NimbusConnect Settings > Audio > Enable Acoustic Echo Cancellation
+4. Enable echo cancellation: ZavaConnect Settings > Audio > Enable Acoustic Echo Cancellation
 5. On Bluetooth headsets, ensure the headset profile is set to "Headset" (HSP/HFP) not "Stereo" (A2DP) — A2DP disables the microphone on most devices
 
 ### Audio Dropping or Cutting Out
@@ -53,7 +53,7 @@ NimbusConnect is NimbusCloud's video conferencing and virtual meeting platform. 
 - Bluetooth headset range exceeded or interference from other 2.4 GHz devices
 
 **Resolution Steps:**
-1. Run NimbusConnect network test: Settings > Network > Run Diagnostics
+1. Run ZavaConnect network test: Settings > Network > Run Diagnostics
 2. Switch from Wi-Fi to Ethernet if available
 3. Close bandwidth-heavy applications (streaming, large file uploads)
 4. If on VPN, switch to split-tunnel or disconnect VPN for the meeting duration
@@ -68,7 +68,7 @@ NimbusConnect is NimbusCloud's video conferencing and virtual meeting platform. 
 - Camera driver conflicts with other applications (Teams, Zoom running in background)
 
 **Resolution Steps:**
-1. Reduce video quality: NimbusConnect Settings > Video > Set to "Standard" (SD) instead of "HD"
+1. Reduce video quality: ZavaConnect Settings > Video > Set to "Standard" (SD) instead of "HD"
 2. Turn off video when screen sharing to free up bandwidth
 3. Close other applications that may be using the camera
 4. Check CPU usage — if above 80%, close unnecessary applications
@@ -85,19 +85,19 @@ NimbusConnect is NimbusCloud's video conferencing and virtual meeting platform. 
 **Resolution Steps:**
 1. Check browser permissions: click the lock icon in the address bar > ensure camera and microphone are "Allow"
 2. Test on a non-corporate network (mobile hotspot) to isolate firewall issues
-3. Ask IT to allowlist: `*.nimbusconnect.io`, UDP 3478, UDP 10000-20000
+3. Ask IT to allowlist: `*.ZavaConnect.io`, UDP 3478, UDP 10000-20000
 4. Try TCP fallback: append `?transport=tcp` to the meeting URL
-5. Clear browser cache and cookies for `nimbusconnect.io`
+5. Clear browser cache and cookies for `ZavaConnect.io`
 
 ## Firewall and Proxy Configuration
 
-IT administrators should allowlist the following for NimbusConnect:
+IT administrators should allowlist the following for ZavaConnect:
 
 ```
 Domains:
-  *.nimbusconnect.io
-  *.nimbuscloud.io
-  turn.nimbusconnect.io
+  *.ZavaConnect.io
+  *.ZavaCloud.io
+  turn.ZavaConnect.io
 
 Ports:
   UDP 3478        (STUN/TURN)

@@ -1,13 +1,13 @@
 # System Maintenance and Incident Response Playbook
 
 **Article Number:** KB-012  
-**Product:** All NimbusCloud Products  
+**Product:** All ZavaCloud Products  
 **Category:** Operations & Incident Response  
 **Last Updated:** February 2026
 
 ## Overview
 
-This article is the reference guide for NimbusCloud system maintenance windows, incident response procedures, and communication protocols. It covers scheduled maintenance, emergency patching, incident severity classification, and rollback procedures.
+This article is the reference guide for ZavaCloud system maintenance windows, incident response procedures, and communication protocols. It covers scheduled maintenance, emergency patching, incident severity classification, and rollback procedures.
 
 ## Scheduled Maintenance
 
@@ -20,29 +20,29 @@ This article is the reference guide for NimbusCloud system maintenance windows, 
 
 ### Maintenance Notifications
 - **14 days before**: Email notification to tenant admins
-- **7 days before**: In-app banner in NimbusAdmin
-- **24 hours before**: Email reminder + status page update at `status.nimbuscloud.io`
+- **7 days before**: In-app banner in ZavaAdmin
+- **24 hours before**: Email reminder + status page update at `status.ZavaCloud.io`
 - **At start**: Status page updated to "Maintenance in Progress"
 - **At completion**: Status page updated to "All Systems Operational" + completion email
 
 ### What Happens During Maintenance
 | Product | Impact | User Experience |
 |---------|--------|----------------|
-| NimbusHub | Brief interruption (< 5 min) | Messages queue and deliver after maintenance |
-| NimbusDocs | Read-only mode | Users can view but not edit documents |
-| NimbusBoard | Brief interruption (< 5 min) | Auto-save preserves in-progress work |
-| NimbusConnect | Active meetings unaffected | New meetings may fail to start during window |
-| NimbusVault | Read-only mode | File uploads paused, downloads available |
-| NimbusAdmin | Full downtime | Admin console unavailable during window |
-| NimbusAPI | Degraded | Read endpoints available, write endpoints return 503 |
+| ZavaHub | Brief interruption (< 5 min) | Messages queue and deliver after maintenance |
+| ZavaDocs | Read-only mode | Users can view but not edit documents |
+| ZavaBoard | Brief interruption (< 5 min) | Auto-save preserves in-progress work |
+| ZavaConnect | Active meetings unaffected | New meetings may fail to start during window |
+| ZavaVault | Read-only mode | File uploads paused, downloads available |
+| ZavaAdmin | Full downtime | Admin console unavailable during window |
+| ZavaAPI | Degraded | Read endpoints available, write endpoints return 503 |
 
 ## Incident Severity Classification
 
 | Severity | Definition | Response Time | Example |
 |----------|-----------|---------------|---------|
-| SEV-1 (Critical) | Complete service outage affecting all users | 15 minutes | NimbusCloud login down for all tenants |
-| SEV-2 (High) | Major feature unavailable or severe degradation | 30 minutes | NimbusConnect meetings failing for 30%+ users |
-| SEV-3 (Medium) | Minor feature unavailable or moderate degradation | 2 hours | NimbusDocs export feature returning errors |
+| SEV-1 (Critical) | Complete service outage affecting all users | 15 minutes | ZavaCloud login down for all tenants |
+| SEV-2 (High) | Major feature unavailable or severe degradation | 30 minutes | ZavaConnect meetings failing for 30%+ users |
+| SEV-3 (Medium) | Minor feature unavailable or moderate degradation | 2 hours | ZavaDocs export feature returning errors |
 | SEV-4 (Low) | Cosmetic issue or minor inconvenience | Next business day | Dashboard chart rendering incorrectly |
 
 ## Incident Response Procedure
@@ -81,7 +81,7 @@ This article is the reference guide for NimbusCloud system maintenance windows, 
 
 ### Application Rollback
 1. Identify the last known good deployment version
-2. Execute rollback via CI/CD pipeline: `nimbus-deploy rollback --version <last-good>`
+2. Execute rollback via CI/CD pipeline: `zava-deploy rollback --version <last-good>`
 3. Verify health checks pass on the rolled-back version
 4. Monitor error rates for 15 minutes post-rollback
 
@@ -106,13 +106,13 @@ If a scheduled maintenance window overruns:
 
 ## Best Practices for Administrators
 
-1. **Subscribe to the status page** at `status.nimbuscloud.io` for real-time updates
+1. **Subscribe to the status page** at `status.ZavaCloud.io` for real-time updates
 2. **Communicate maintenance windows** to your organization's end users proactively
 3. **Avoid scheduling critical work** during published maintenance windows
-4. **Configure webhook notifications** for status page events (NimbusAdmin > Notifications > Status Page)
-5. **Keep emergency contacts updated** in NimbusAdmin > Settings > Support Contacts
+4. **Configure webhook notifications** for status page events (ZavaAdmin > Notifications > Status Page)
+5. **Keep emergency contacts updated** in ZavaAdmin > Settings > Support Contacts
 
 ## Related Articles
 - KB-001: VPN Connectivity Troubleshooting
-- KB-002: NimbusConnect Video Call Quality Troubleshooting
-- KB-011: NimbusAPI Rate Limits and Integration Best Practices
+- KB-002: ZavaConnect Video Call Quality Troubleshooting
+- KB-011: ZavaAPI Rate Limits and Integration Best Practices

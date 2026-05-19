@@ -1,18 +1,18 @@
 # Tenant Data Migration and Workspace Cloning
 
 **Article Number:** KB-009  
-**Product:** NimbusBoard / NimbusAdmin  
+**Product:** ZavaBoard / ZavaAdmin  
 **Category:** Data Migration & Templates  
 **Last Updated:** February 2026
 
 ## Overview
 
-This article covers workspace migration, bulk cloning, and project templates in NimbusBoard and across the NimbusCloud platform. These operations are commonly performed during organizational restructuring, team onboarding, and quarterly planning cycles.
+This article covers workspace migration, bulk cloning, and project templates in ZavaBoard and across the ZavaCloud platform. These operations are commonly performed during organizational restructuring, team onboarding, and quarterly planning cycles.
 
-## Workspace Cloning in NimbusBoard
+## Workspace Cloning in ZavaBoard
 
 ### Single Workspace Clone
-1. Open the source workspace in NimbusBoard
+1. Open the source workspace in ZavaBoard
 2. Click the workspace menu (⋯) > **Clone Workspace**
 3. Choose what to include:
    - ✅ Board structure (columns, swimlanes)
@@ -27,7 +27,7 @@ This article covers workspace migration, bulk cloning, and project templates in 
 ### Bulk Workspace Cloning
 For cloning multiple workspaces (e.g., quarterly planning reset):
 
-1. Navigate to NimbusAdmin > NimbusBoard > Bulk Operations
+1. Navigate to ZavaAdmin > ZavaBoard > Bulk Operations
 2. Click **Bulk Clone**
 3. Select source workspaces (up to 200 at a time)
 4. Configure clone options (same as single clone)
@@ -56,10 +56,10 @@ For cloning multiple workspaces (e.g., quarterly planning reset):
 - Workspace contains file attachments exceeding 5 GB total
 
 **Resolution Steps:**
-1. Check the bulk job log: NimbusAdmin > NimbusBoard > Bulk Operations > Job History > [job] > View Log
+1. Check the bulk job log: ZavaAdmin > ZavaBoard > Bulk Operations > Job History > [job] > View Log
 2. For workspaces with custom integrations: clone without integrations, then manually re-add
 3. For oversized workspaces: archive old cards before cloning to reduce below the 10,000 limit
-4. For attachment limits: clone without attachments, then migrate files separately via NimbusVault
+4. For attachment limits: clone without attachments, then migrate files separately via ZavaVault
 5. Retry failed workspaces individually
 
 ### Automations Not Working After Clone
@@ -95,20 +95,20 @@ For cloning multiple workspaces (e.g., quarterly planning reset):
 
 ### Organization Template Library
 Admins can manage organization-wide templates:
-- NimbusAdmin > NimbusBoard > Templates
+- ZavaAdmin > ZavaBoard > Templates
 - Pin recommended templates for new teams
 - Retire outdated templates (archive, don't delete — existing workspaces aren't affected)
 
 ## Cross-Product Data Migration
 
-### Migrating Between NimbusCloud Tenants
+### Migrating Between ZavaCloud Tenants
 For organizational restructuring (mergers, divestitures):
 
-1. **Export from source tenant**: NimbusAdmin > Data Management > Export
-   - Select products: NimbusBoard workspaces, NimbusDocs documents, NimbusVault files
-   - Export generates a `.nimbusexport` archive
-2. **Import to destination tenant**: NimbusAdmin > Data Management > Import
-   - Upload the `.nimbusexport` archive
+1. **Export from source tenant**: ZavaAdmin > Data Management > Export
+   - Select products: ZavaBoard workspaces, ZavaDocs documents, ZavaVault files
+   - Export generates a `.zavaexport` archive
+2. **Import to destination tenant**: ZavaAdmin > Data Management > Import
+   - Upload the `.zavaexport` archive
    - Map users from source to destination tenant
    - Review and confirm the import plan
 3. Post-migration:
@@ -125,6 +125,6 @@ For organizational restructuring (mergers, divestitures):
 5. **Document custom integrations** in each workspace so they can be manually re-added after cloning
 
 ## Related Articles
-- KB-007: NimbusDocs Offline Sync and Conflict Resolution
-- KB-013: NimbusVault File Permissions After Workspace Migration
-- KB-011: NimbusAPI Rate Limits and Integration Best Practices
+- KB-007: ZavaDocs Offline Sync and Conflict Resolution
+- KB-013: ZavaVault File Permissions After Workspace Migration
+- KB-011: ZavaAPI Rate Limits and Integration Best Practices

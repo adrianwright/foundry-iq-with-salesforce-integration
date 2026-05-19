@@ -1,9 +1,9 @@
-# Support Case: File Permissions Broken After NimbusVault Migration
+# Support Case: File Permissions Broken After ZavaVault Migration
 
 **Case Number**: CASE-013  
 **Status**: Resolved  
 **Priority**: High  
-**Product**: NimbusVault  
+**Product**: ZavaVault  
 **Category**: File Management & Permissions  
 **Origin**: Web  
 **Contact**: Michelle Tanaka, IT Operations Manager, Bridgewater Associates  
@@ -14,16 +14,16 @@
 ---
 
 ## Subject
-350 users reporting "Access Denied" on files after workspace restructuring and NimbusVault folder migration
+350 users reporting "Access Denied" on files after workspace restructuring and ZavaVault folder migration
 
 ## Description
-Michelle Tanaka reported that after restructuring their NimbusCloud workspace hierarchy (consolidating 12 department workspaces into 4 division-level workspaces), approximately 350 users cannot access files in the migrated NimbusVault folders. Files that were previously accessible now return "Access Denied." The migration was performed over the weekend by moving 8 top-level NimbusVault folders into new parent folders.
+Michelle Tanaka reported that after restructuring their ZavaCloud workspace hierarchy (consolidating 12 department workspaces into 4 division-level workspaces), approximately 350 users cannot access files in the migrated ZavaVault folders. Files that were previously accessible now return "Access Denied." The migration was performed over the weekend by moving 8 top-level ZavaVault folders into new parent folders.
 
 ## Investigation Notes
 
 **2026-02-17 — Initial Triage (Support Engineer: Chris Nakamura)**
 - Confirmed "Access Denied" errors for files in 8 migrated folders
-- Permission audit (NimbusAdmin > NimbusVault > Permission Audit) revealed:
+- Permission audit (ZavaAdmin > ZavaVault > Permission Audit) revealed:
   - Inherited permissions from old parent folders were dropped when folders were moved
   - New parent folders have a more restrictive permission set (division-level groups only, not department-level groups)
   - Direct permissions on individual files were preserved, but most users had access via inheritance
@@ -35,7 +35,7 @@ Michelle Tanaka reported that after restructuring their NimbusCloud workspace hi
 - Michelle chose Option A
 
 **2026-02-19 — Permission Restructuring**
-- Step 1: Added department groups as nested members of the appropriate division groups in NimbusAdmin
+- Step 1: Added department groups as nested members of the appropriate division groups in ZavaAdmin
 - Step 2: Applied "Re-inherit from parent" on all 8 migrated folders: Right-click > Sharing & Permissions > Advanced > Re-inherit from parent
 - Step 3: Verified access for 10 sample users across different departments — all files accessible
 
@@ -46,9 +46,9 @@ Michelle Tanaka reported that after restructuring their NimbusCloud workspace hi
 - Recommended running a permission audit before and after any folder migration (per KB-013)
 
 ## Resolution
-Moving NimbusVault folders to new parent folders dropped inherited permissions. Fixed by nesting department groups into division groups and re-inheriting permissions from the new parent hierarchy. KB-013 documents file permission behavior during migrations.
+Moving ZavaVault folders to new parent folders dropped inherited permissions. Fixed by nesting department groups into division groups and re-inheriting permissions from the new parent hierarchy. KB-013 documents file permission behavior during migrations.
 
 ## Related Articles
-- KB-013: NimbusVault File Permissions After Workspace Migration
+- KB-013: ZavaVault File Permissions After Workspace Migration
 - KB-009: Tenant Data Migration and Workspace Cloning
 - FORUM-013: File Access Denied After Workspace Migration

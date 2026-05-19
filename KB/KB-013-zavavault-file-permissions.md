@@ -1,15 +1,15 @@
-# NimbusVault File Permissions After Workspace Migration
+# ZavaVault File Permissions After Workspace Migration
 
 **Article Number:** KB-013  
-**Product:** NimbusVault  
+**Product:** ZavaVault  
 **Category:** File Management & Permissions  
 **Last Updated:** February 2026
 
 ## Overview
 
-When workspaces are migrated, cloned, or restructured in NimbusCloud, file permissions in NimbusVault may not carry over as expected. This article covers how file permissions work in NimbusVault, common issues after migration, and resolution steps for broken access.
+When workspaces are migrated, cloned, or restructured in ZavaCloud, file permissions in ZavaVault may not carry over as expected. This article covers how file permissions work in ZavaVault, common issues after migration, and resolution steps for broken access.
 
-## NimbusVault Permission Model
+## ZavaVault Permission Model
 
 ### Permission Levels
 | Level | Capabilities |
@@ -17,7 +17,7 @@ When workspaces are migrated, cloned, or restructured in NimbusCloud, file permi
 | **Owner** | Full control — read, write, share, delete, manage permissions |
 | **Editor** | Read and write — can edit files and upload to the folder |
 | **Viewer** | Read only — can view and download files |
-| **No access** | Cannot see the file or folder in NimbusVault |
+| **No access** | Cannot see the file or folder in ZavaVault |
 
 ### Permission Inheritance
 - Files inherit permissions from their parent folder by default
@@ -28,9 +28,9 @@ When workspaces are migrated, cloned, or restructured in NimbusCloud, file permi
 | Source | How It Works |
 |--------|-------------|
 | Direct assignment | Admin or owner grants access to a specific user |
-| Group membership | Access granted via NimbusCloud group (synced from IdP or manually created) |
-| Workspace membership | Members of a NimbusBoard workspace get access to the linked NimbusVault folder |
-| Shared link | Time-limited access URL (no NimbusCloud account required for external sharing) |
+| Group membership | Access granted via ZavaCloud group (synced from IdP or manually created) |
+| Workspace membership | Members of a ZavaBoard workspace get access to the linked ZavaVault folder |
+| Shared link | Time-limited access URL (no ZavaCloud account required for external sharing) |
 
 ## Post-Migration Permission Issues
 
@@ -38,19 +38,19 @@ When workspaces are migrated, cloned, or restructured in NimbusCloud, file permi
 **Symptoms:** Users in a cloned workspace cannot access files that were linked from the original workspace.
 
 **Common Causes:**
-- File links in cloned workspaces still point to the original workspace's NimbusVault folder
+- File links in cloned workspaces still point to the original workspace's ZavaVault folder
 - New workspace members don't have permission on the original file location
 - Files were not cloned — only references (links) were copied
 
 **Resolution Steps:**
-1. Check if files were cloned or linked: Open the file in NimbusVault > Properties > Location
+1. Check if files were cloned or linked: Open the file in ZavaVault > Properties > Location
 2. If files are linked (not cloned), the new workspace members need permission on the original folder:
    - Option A: Grant the new workspace group access to the original folder
-   - Option B: Copy files to the new workspace's NimbusVault folder (breaks the link to the original)
-3. For bulk permission updates: NimbusAdmin > NimbusVault > Bulk Permissions > select folder > Add Group > [new workspace group]
+   - Option B: Copy files to the new workspace's ZavaVault folder (breaks the link to the original)
+3. For bulk permission updates: ZavaAdmin > ZavaVault > Bulk Permissions > select folder > Add Group > [new workspace group]
 
 ### Inherited Permissions Lost After Folder Move
-**Symptoms:** After moving a folder to a new location in NimbusVault, users lose access.
+**Symptoms:** After moving a folder to a new location in ZavaVault, users lose access.
 
 **Common Causes:**
 - The folder was moved outside the parent hierarchy that granted inherited permissions
@@ -69,18 +69,18 @@ When workspaces are migrated, cloned, or restructured in NimbusCloud, file permi
 **Common Causes:**
 - File IDs changed during migration (if files were re-created instead of moved)
 - Shared link settings were not migrated
-- File was moved to a different NimbusVault location, changing the access path
+- File was moved to a different ZavaVault location, changing the access path
 
 **Resolution Steps:**
-1. Locate the file in its new location using NimbusVault search
+1. Locate the file in its new location using ZavaVault search
 2. Generate a new shared link: Right-click > Share > Create Link
 3. Distribute the new link to external recipients
-4. For bulk link recovery: NimbusAdmin > NimbusVault > Shared Links > filter by "Broken" status
+4. For bulk link recovery: ZavaAdmin > ZavaVault > Shared Links > filter by "Broken" status
 
 ## Permission Audit
 
 ### Running a Permission Audit
-1. Navigate to NimbusAdmin > NimbusVault > Permission Audit
+1. Navigate to ZavaAdmin > ZavaVault > Permission Audit
 2. Select the folder or workspace to audit
 3. Click **Generate Report** — the report shows:
    - All users and groups with access
@@ -91,7 +91,7 @@ When workspaces are migrated, cloned, or restructured in NimbusCloud, file permi
 
 ### Automated Permission Alerts
 Configure alerts for permission changes:
-- NimbusAdmin > Notifications > NimbusVault > Permission Changes
+- ZavaAdmin > Notifications > ZavaVault > Permission Changes
 - Alert when: files shared externally, bulk permission changes, owner changes
 
 ## Best Practices
@@ -104,5 +104,5 @@ Configure alerts for permission changes:
 
 ## Related Articles
 - KB-009: Tenant Data Migration and Workspace Cloning
-- KB-007: NimbusDocs Offline Sync and Conflict Resolution
-- KB-004: NimbusAdmin Tenant and User Provisioning
+- KB-007: ZavaDocs Offline Sync and Conflict Resolution
+- KB-004: ZavaAdmin Tenant and User Provisioning

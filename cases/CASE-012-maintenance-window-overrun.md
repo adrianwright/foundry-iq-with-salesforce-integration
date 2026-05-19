@@ -3,7 +3,7 @@
 **Case Number**: CASE-012  
 **Status**: Resolved  
 **Priority**: Critical  
-**Product**: All NimbusCloud Products  
+**Product**: All ZavaCloud Products  
 **Category**: Operations & Incident Response  
 **Origin**: Phone  
 **Contact**: Patricia Gomez, VP of Operations, Stellar Manufacturing  
@@ -14,10 +14,10 @@
 ---
 
 ## Subject
-NimbusCloud maintenance window overran by 3 hours — production blocked for overnight shift operations
+ZavaCloud maintenance window overran by 3 hours — production blocked for overnight shift operations
 
 ## Description
-Patricia Gomez reported that the scheduled NimbusCloud maintenance window (Saturday 02:00-06:00 UTC) overran until 09:00 UTC. Stellar Manufacturing's overnight shift (which starts at 06:00 UTC) was unable to access NimbusHub for operational communications, NimbusDocs for shift reports, and NimbusBoard for task management. The overrun was not communicated until 07:30 UTC, 90 minutes after the original window was supposed to end.
+Patricia Gomez reported that the scheduled ZavaCloud maintenance window (Saturday 02:00-06:00 UTC) overran until 09:00 UTC. Stellar Manufacturing's overnight shift (which starts at 06:00 UTC) was unable to access ZavaHub for operational communications, ZavaDocs for shift reports, and ZavaBoard for task management. The overrun was not communicated until 07:30 UTC, 90 minutes after the original window was supposed to end.
 
 ## Investigation Notes
 
@@ -31,14 +31,14 @@ Patricia Gomez reported that the scheduled NimbusCloud maintenance window (Satur
 - 09:00 UTC: Status page updated to "All Systems Operational"
 
 **2026-02-15 — Customer Impact**
-- Stellar Manufacturing's overnight shift (200+ workers) had no access to NimbusCloud from 06:00-09:00 UTC
+- Stellar Manufacturing's overnight shift (200+ workers) had no access to ZavaCloud from 06:00-09:00 UTC
 - Shift supervisor created paper-based workarounds for task tracking
 - Estimated productivity impact: 3 hours × 200 workers = 600 person-hours
 - No data loss — all pending messages, documents, and tasks were preserved during maintenance
 
-**2026-02-16 — Post-Incident Actions by NimbusCloud**
+**2026-02-16 — Post-Incident Actions by ZavaCloud**
 - Published post-mortem to status page:
-  - Root cause: Database migration for NimbusBoard analytics tables had an undocumented dependency on a NimbusDocs schema
+  - Root cause: Database migration for ZavaBoard analytics tables had an undocumented dependency on a ZavaDocs schema
   - Why communication was delayed: Status page update process required manual DBA confirmation that was delayed during the troubleshooting
 - Action items:
   1. Implement automated status page updates when maintenance overruns the scheduled window (30-second delay alerts)
@@ -51,4 +51,4 @@ Maintenance overrun caused by an undocumented database schema dependency. Servic
 
 ## Related Articles
 - KB-012: System Maintenance and Incident Response Playbook
-- FORUM-012: Timezone Display Confusion in NimbusBoard Deadlines
+- FORUM-012: Timezone Display Confusion in ZavaBoard Deadlines

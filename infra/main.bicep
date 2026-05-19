@@ -1,5 +1,5 @@
 // ============================================================================
-// NimbusCloud Helpdesk Demo Infrastructure - Main Entry Point (azd)
+// ZavaCloud Helpdesk Demo Infrastructure - Main Entry Point (azd)
 // Azure AI Foundry + Azure AI Search + APIM + Logic Apps
 // ============================================================================
 
@@ -18,6 +18,9 @@ param environmentName string
 @description('Primary location for all resources')
 param location string
 
+@description('Location override for Azure API Management (allows deploying APIM to a different region than other resources). Defaults to the primary location.')
+param apimLocation string = ''
+
 @description('Principal ID to grant access to resources')
 param principalId string = ''
 
@@ -26,13 +29,13 @@ param principalId string = ''
 param aiSearchSku string = 'basic'
 
 @description('The name of the model to deploy')
-param modelName string = 'gpt-5.2'
+param modelName string = 'gpt-5.4'
 
 @description('The model format/provider')
 param modelFormat string = 'OpenAI'
 
 @description('The model version')
-param modelVersion string = '2025-12-11'
+param modelVersion string = '2026-03-05'
 
 @description('The model SKU name')
 param modelSkuName string = 'GlobalStandard'
@@ -63,7 +66,7 @@ var abbrs = loadJsonContent('./abbreviations.json')
 var resourceToken = toLower(uniqueString(subscription().id, environmentName, location))
 var tags = {
   'azd-env-name': environmentName
-  project: 'nimbus-helpdesk-demo'
+  project: 'zava-helpdesk-demo'
 }
 
 // ============================================================================
@@ -107,11 +110,12 @@ module apim 'apim.bicep' = {
   scope: rg
   params: {
     environmentName: environmentName
-    location: location
+    location: empty(apimLocation) ? location : apimLocation
     principalId: principalId
     salesforceClientId: salesforceClientId
     salesforceClientSecret: salesforceClientSecret
     salesforceTokenEndpoint: salesforceTokenEndpoint
+    logAnalyticsWorkspaceId: resources.outputs.logAnalyticsWorkspaceId
   }
 }
 

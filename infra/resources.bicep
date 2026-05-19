@@ -1,5 +1,5 @@
 // ============================================================================
-// NimbusCloud Helpdesk Demo - Resources Module
+// ZavaCloud Helpdesk Demo - Resources Module
 // All Azure resources deployed to the resource group
 // ============================================================================
 
@@ -20,13 +20,13 @@ param principalId string = ''
 param aiSearchSku string = 'basic'
 
 @description('The name of the model to deploy')
-param modelName string = 'gpt-5.2'
+param modelName string = 'gpt-5.4'
 
 @description('The model format/provider')
 param modelFormat string = 'OpenAI'
 
 @description('The model version')
-param modelVersion string = '2025-12-11'
+param modelVersion string = '2026-03-05'
 
 @description('The model SKU name')
 param modelSkuName string = 'GlobalStandard'
@@ -145,13 +145,13 @@ resource aiProject 'Microsoft.CognitiveServices/accounts/projects@2025-04-01-pre
     type: 'SystemAssigned'
   }
   properties: {
-    description: 'NimbusCloud Helpdesk RAG Chatbot Demo'
+    description: 'ZavaCloud Helpdesk RAG Chatbot Demo'
     displayName: 'Helpdesk Chatbot'
   }
 }
 
 // ============================================================================
-// Model Deployment (GPT-5.2)
+// Model Deployment (GPT-5.4) — used for both the agent and the Foundry IQ KB
 // ============================================================================
 
 resource modelDeployment 'Microsoft.CognitiveServices/accounts/deployments@2025-04-01-preview' = {
@@ -171,36 +171,15 @@ resource modelDeployment 'Microsoft.CognitiveServices/accounts/deployments@2025-
 }
 
 // ============================================================================
-// Model Deployment (GPT-4.1)
-// ============================================================================
-
-resource gpt41Deployment 'Microsoft.CognitiveServices/accounts/deployments@2025-04-01-preview' = {
-  parent: aiFoundry
-  name: 'gpt-4.1'
-  dependsOn: [modelDeployment]
-  sku: {
-    name: 'GlobalStandard'
-    capacity: 100
-  }
-  properties: {
-    model: {
-      format: 'OpenAI'
-      name: 'gpt-4.1'
-      version: '2025-04-14'
-    }
-  }
-}
-
-// ============================================================================
 // Model Deployment (text-embedding-3-small)
 // ============================================================================
 
 resource embeddingDeployment 'Microsoft.CognitiveServices/accounts/deployments@2025-04-01-preview' = {
   parent: aiFoundry
   name: 'text-embedding-3-small'
-  dependsOn: [modelDeployment, gpt41Deployment]
+  dependsOn: [modelDeployment]
   sku: {
-    name: 'Standard'
+    name: 'GlobalStandard'
     capacity: 100
   }
   properties: {
@@ -288,6 +267,22 @@ resource foundrySearchContributorRole 'Microsoft.Authorization/roleAssignments@2
   }
 }
 
+// Search MI -> AOAI: Cognitive Services OpenAI User
+// Required so the Search service can call AOAI chat/completions for the Foundry
+// knowledge base's model query planning + semantic ranking inside knowledge_base_retrieve.
+// This is the ONLY role required for AAD inference; "Cognitive Services User" and
+// "Azure AI Developer" are NOT needed for the data action
+// Microsoft.CognitiveServices/accounts/OpenAI/deployments/chat/completions/action.
+resource searchAoaiOpenAIUserRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  scope: aiFoundry
+  name: guid(aiFoundry.id, aiSearch.id, '5e0bd9bd-7b93-4f28-af87-19fc36ad61bd')
+  properties: {
+    principalId: aiSearch.identity.principalId
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '5e0bd9bd-7b93-4f28-af87-19fc36ad61bd') // Cognitive Services OpenAI User
+    principalType: 'ServicePrincipal'
+  }
+}
+
 // ============================================================================
 // Logic App with Salesforce Trigger
 // ============================================================================
@@ -351,7 +346,7 @@ resource logicApp 'Microsoft.Logic/workflows@2019-05-01' = {
             path: '/datasets/default/tables/@{encodeURIComponent(encodeURIComponent(\'Case\'))}/onnewitems'
           }
           recurrence: {
-            interval: 15
+            interval: 30
             frequency: 'Second'
           }
           splitOn: '@triggerBody()?[\'value\']'
@@ -488,7 +483,7 @@ resource logicAppUpdate 'Microsoft.Logic/workflows@2019-05-01' = {
             path: '/datasets/default/tables/@{encodeURIComponent(encodeURIComponent(\'Case\'))}/onupdateditems'
           }
           recurrence: {
-            interval: 15
+            interval: 30
             frequency: 'Second'
           }
           splitOn: '@triggerBody()?[\'value\']'
@@ -636,3 +631,4 @@ output logicAppUpdateName string = logicAppUpdate.name
 output logicAppUpdateId string = logicAppUpdate.id
 output salesforceConnectionName string = salesforceConnection.name
 output salesforceConnectionId string = salesforceConnection.id
+output logAnalyticsWorkspaceId string = logAnalytics.id

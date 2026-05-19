@@ -1,21 +1,21 @@
-# NimbusDocs Offline Sync and Conflict Resolution
+# ZavaDocs Offline Sync and Conflict Resolution
 
 **Article Number:** KB-007  
-**Product:** NimbusDocs  
+**Product:** ZavaDocs  
 **Category:** Document Management & Sync  
 **Last Updated:** February 2026
 
 ## Overview
 
-NimbusDocs allows users to create, edit, and collaborate on documents in real time. The desktop client supports offline editing with automatic synchronization when connectivity is restored. This article covers the offline sync architecture, conflict resolution process, and troubleshooting common sync failures.
+ZavaDocs allows users to create, edit, and collaborate on documents in real time. The desktop client supports offline editing with automatic synchronization when connectivity is restored. This article covers the offline sync architecture, conflict resolution process, and troubleshooting common sync failures.
 
 ## Offline Sync Architecture
 
 ### How Offline Mode Works
-1. **NimbusDocs Desktop Client** caches a local copy of recently accessed documents
+1. **ZavaDocs Desktop Client** caches a local copy of recently accessed documents
 2. When the user goes offline (VPN drop, network loss, airplane mode), editing continues on the local copy
 3. **Change tracking** records every edit as an operational transform (OT) delta
-4. When connectivity returns, the desktop client pushes local deltas to the NimbusDocs server
+4. When connectivity returns, the desktop client pushes local deltas to the ZavaDocs server
 5. The server merges deltas from all offline editors using a **last-writer-wins with conflict detection** strategy
 6. If conflicts are detected, a **conflict copy** is created for manual resolution
 
@@ -41,8 +41,8 @@ NimbusDocs allows users to create, edit, and collaborate on documents in real ti
 **Resolution Steps:**
 1. Check sync status: Desktop client tray icon > View Sync Status — look for "Pending" or "Conflict" items
 2. If sync is paused, click Resume and wait for the queue to process
-3. Check the **Conflict Copies** folder in NimbusVault (NimbusVault > [user] > Conflict Copies)
-4. If files were deleted server-side, check NimbusVault Trash (retained for 90 days)
+3. Check the **Conflict Copies** folder in ZavaVault (ZavaVault > [user] > Conflict Copies)
+4. If files were deleted server-side, check ZavaVault Trash (retained for 90 days)
 5. Update desktop client to v4.2 or later: Help > Check for Updates
 
 ### Conflict Copies Created
@@ -55,7 +55,7 @@ NimbusDocs allows users to create, edit, and collaborate on documents in real ti
 
 **Resolution Steps:**
 1. Open both the original and conflict copy side-by-side
-2. Use NimbusDocs' **Compare Documents** feature: File > Compare > select the conflict copy
+2. Use ZavaDocs' **Compare Documents** feature: File > Compare > select the conflict copy
 3. Manually merge desired changes from the conflict copy into the original
 4. Delete the conflict copy after reconciliation
 5. To prevent future conflicts, prefer **real-time co-editing** (web browser) for documents with multiple active editors
@@ -71,7 +71,7 @@ NimbusDocs allows users to create, edit, and collaborate on documents in real ti
 **Resolution Steps:**
 1. Check which file is stuck: Desktop client > View Sync Status > expand "In Progress" items
 2. For large files, pause sync, split the document, and resume
-3. Verify WebSocket connections are allowed through your proxy/firewall (port 443, `wss://sync.nimbuscloud.io`)
+3. Verify WebSocket connections are allowed through your proxy/firewall (port 443, `wss://sync.ZavaCloud.io`)
 4. Close any application that might be locking the file (antivirus, backup agents)
 5. As a last resort, reset sync: Desktop client > Settings > Advanced > Reset Sync State (re-downloads all cached files)
 
@@ -99,6 +99,6 @@ NimbusDocs allows users to create, edit, and collaborate on documents in real ti
 5. **Check sync status before closing the desktop client** — ensure all changes have been uploaded
 
 ## Related Articles
-- KB-013: NimbusVault File Permissions After Workspace Migration
+- KB-013: ZavaVault File Permissions After Workspace Migration
 - KB-009: Tenant Data Migration and Workspace Cloning
 - KB-001: VPN Connectivity Troubleshooting

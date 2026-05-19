@@ -118,7 +118,7 @@ def parse_kb_markdown(file_path: str) -> dict:
     Expected format:
         # Title
         **Article Number:** KB-001
-        **Product:** NimbusCloud
+        **Product:** ZavaCloud
         **Category:** Grading & Integration
         **Last Updated:** January 2026
 

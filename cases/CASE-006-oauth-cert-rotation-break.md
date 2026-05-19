@@ -3,7 +3,7 @@
 **Case Number**: CASE-006  
 **Status**: Resolved  
 **Priority**: Critical  
-**Product**: NimbusID / NimbusAPI  
+**Product**: ZavaID / ZavaAPI  
 **Category**: Authentication & Integration  
 **Origin**: Phone  
 **Contact**: James Okafor, Integration Architect, Atlas Retail Group  
@@ -14,16 +14,16 @@
 ---
 
 ## Subject
-Slack and Jira integrations broken after NimbusCloud JWKS key rotation — all OAuth tokens rejected
+Slack and Jira integrations broken after ZavaCloud JWKS key rotation — all OAuth tokens rejected
 
 ## Description
-James Okafor reported that all third-party integrations (Slack, Jira, Zapier, and 3 custom internal apps) stopped working at approximately 02:00 UTC on February 5. All API calls return 401 Unauthorized. The issue began immediately after NimbusCloud's scheduled JWKS key rotation.
+James Okafor reported that all third-party integrations (Slack, Jira, Zapier, and 3 custom internal apps) stopped working at approximately 02:00 UTC on February 5. All API calls return 401 Unauthorized. The issue began immediately after ZavaCloud's scheduled JWKS key rotation.
 
 ## Investigation Notes
 
 **2026-02-05 — Initial Triage (Support Engineer: Priya Sharma)**
 - Confirmed JWKS key rotation occurred at 01:45 UTC as part of scheduled maintenance
-- New signing key (`kid: nimbus-2026-02`) was published to `/.well-known/jwks.json` 24 hours prior
+- New signing key (`kid: zava-2026-02`) was published to `/.well-known/jwks.json` 24 hours prior
 - Atlas's Slack and Jira integrations are using a middleware proxy that caches the JWKS key set
 - The proxy is not refreshing JWKS when it encounters an unknown `kid` — it fails with 401 instead
 - Custom internal apps have the JWKS key hardcoded (not fetched dynamically)
@@ -31,7 +31,7 @@ James Okafor reported that all third-party integrations (Slack, Jira, Zapier, an
 **2026-02-05 — Immediate Fix**
 - Provided the current JWKS key set to James for manual update in custom apps
 - Guided James through updating the middleware proxy configuration to:
-  1. Fetch JWKS dynamically from `https://auth.nimbuscloud.io/.well-known/jwks.json`
+  1. Fetch JWKS dynamically from `https://auth.ZavaCloud.io/.well-known/jwks.json`
   2. Cache for 1 hour but refresh when encountering an unknown `kid`
 - Slack and Jira integrations restored within 30 minutes of proxy update
 
@@ -41,7 +41,7 @@ James Okafor reported that all third-party integrations (Slack, Jira, Zapier, an
 
 **2026-02-08 — Post-Incident Review**
 - Root cause: Static JWKS key caching without refresh-on-unknown-kid logic
-- Recommended Atlas subscribe to NimbusCloud's certificate rotation calendar (NimbusAdmin > Notifications > Certificate Events)
+- Recommended Atlas subscribe to ZavaCloud's certificate rotation calendar (ZavaAdmin > Notifications > Certificate Events)
 - KB-006 provides the full JWKS best practice guidance
 
 ## Resolution

@@ -1,42 +1,42 @@
 # Email Deliverability and Notification Configuration
 
 **Article Number:** KB-010  
-**Product:** NimbusCloud Platform  
+**Product:** ZavaCloud Platform  
 **Category:** Email & Notifications  
 **Last Updated:** February 2026
 
 ## Overview
 
-NimbusCloud sends notifications via email for events across all products — chat mentions in NimbusHub, document shares in NimbusDocs, meeting invitations in NimbusConnect, task assignments in NimbusBoard, and security alerts from NimbusID. This article covers email deliverability configuration (SPF, DKIM, DMARC), custom sender domains, and notification management.
+ZavaCloud sends notifications via email for events across all products — chat mentions in ZavaHub, document shares in ZavaDocs, meeting invitations in ZavaConnect, task assignments in ZavaBoard, and security alerts from ZavaID. This article covers email deliverability configuration (SPF, DKIM, DMARC), custom sender domains, and notification management.
 
 ## Default Email Configuration
 
-By default, NimbusCloud sends all notifications from:
+By default, ZavaCloud sends all notifications from:
 ```
-From: notifications@nimbuscloud.io
-Reply-To: no-reply@nimbuscloud.io
+From: notifications@ZavaCloud.io
+Reply-To: no-reply@ZavaCloud.io
 ```
 
 These emails pass SPF, DKIM, and DMARC checks automatically. No configuration is needed for the default sender.
 
 ## Custom Sender Domain
 
-Organizations can send NimbusCloud notifications from their own domain (e.g., `notifications@yourcompany.com`):
+Organizations can send ZavaCloud notifications from their own domain (e.g., `notifications@yourcompany.com`):
 
 ### Setup Steps
-1. Navigate to NimbusAdmin > Settings > Email > Custom Sender Domain
+1. Navigate to ZavaAdmin > Settings > Email > Custom Sender Domain
 2. Enter your custom "From" domain (e.g., `yourcompany.com`)
-3. NimbusCloud generates DNS records you must add:
+3. ZavaCloud generates DNS records you must add:
 
 **SPF Record:**
 ```
-v=spf1 include:spf.nimbuscloud.io ~all
+v=spf1 include:spf.ZavaCloud.io ~all
 ```
 Add this to your existing SPF record, or create one if none exists.
 
 **DKIM Record:**
 ```
-nimbuscloud._domainkey.yourcompany.com  TXT  "v=DKIM1; k=rsa; p=<generated-public-key>"
+ZavaCloud._domainkey.yourcompany.com  TXT  "v=DKIM1; k=rsa; p=<generated-public-key>"
 ```
 
 **DMARC Record (recommended):**
@@ -44,7 +44,7 @@ nimbuscloud._domainkey.yourcompany.com  TXT  "v=DKIM1; k=rsa; p=<generated-publi
 _dmarc.yourcompany.com  TXT  "v=DMARC1; p=quarantine; rua=mailto:dmarc-reports@yourcompany.com"
 ```
 
-4. Click **Verify DNS** in NimbusAdmin — the system checks for the SPF and DKIM records
+4. Click **Verify DNS** in ZavaAdmin — the system checks for the SPF and DKIM records
 5. Once verified, set the custom domain as active
 6. Send a test email to confirm deliverability
 
@@ -58,7 +58,7 @@ DNS changes may take up to 48 hours to propagate. Common timeline:
 ## Common Email Deliverability Issues
 
 ### Notifications Going to Spam
-**Symptoms:** Users report NimbusCloud emails landing in spam/junk folder.
+**Symptoms:** Users report ZavaCloud emails landing in spam/junk folder.
 
 **Common Causes:**
 - Custom sender domain configured but SPF/DKIM records missing or incorrect
@@ -67,10 +67,10 @@ DNS changes may take up to 48 hours to propagate. Common timeline:
 - DKIM key rotation pending — old key expired, new key not yet published
 
 **Resolution Steps:**
-1. Verify SPF record: Use an SPF checker tool to confirm `include:spf.nimbuscloud.io` is present
-2. Verify DKIM: Use a DKIM validator to test the `nimbuscloud._domainkey` record
-3. Check for multiple SPF records — merge them into one: `v=spf1 include:spf.nimbuscloud.io include:_spf.google.com ~all`
-4. Ask recipients' IT teams to allowlist `notifications@nimbuscloud.io` or your custom sender address
+1. Verify SPF record: Use an SPF checker tool to confirm `include:spf.ZavaCloud.io` is present
+2. Verify DKIM: Use a DKIM validator to test the `ZavaCloud._domainkey` record
+3. Check for multiple SPF records — merge them into one: `v=spf1 include:spf.ZavaCloud.io include:_spf.google.com ~all`
+4. Ask recipients' IT teams to allowlist `notifications@ZavaCloud.io` or your custom sender address
 5. Check DMARC reports for alignment failures
 
 ### Notification Emails Not Sent
@@ -78,18 +78,18 @@ DNS changes may take up to 48 hours to propagate. Common timeline:
 
 **Common Causes:**
 - User has disabled email notifications: Profile > Notifications > Email
-- NimbusAdmin email sending is disabled (admin policy)
+- ZavaAdmin email sending is disabled (admin policy)
 - Email suppression list — user's email bounced previously and was auto-suppressed
 - Custom domain DNS verification expired after a DNS change
 
 **Resolution Steps:**
-1. Check user notification preferences: NimbusAdmin > Users > [user] > Notification Settings
-2. Check admin policy: NimbusAdmin > Settings > Email > Sending Status — should show "Active"
-3. Check suppression list: NimbusAdmin > Settings > Email > Suppression List — remove the email if it was soft-bounced
-4. If using custom domain, re-verify DNS: NimbusAdmin > Settings > Email > Verify DNS
+1. Check user notification preferences: ZavaAdmin > Users > [user] > Notification Settings
+2. Check admin policy: ZavaAdmin > Settings > Email > Sending Status — should show "Active"
+3. Check suppression list: ZavaAdmin > Settings > Email > Suppression List — remove the email if it was soft-bounced
+4. If using custom domain, re-verify DNS: ZavaAdmin > Settings > Email > Verify DNS
 
 ### Bounce Rate Too High
-**Symptoms:** NimbusAdmin shows email bounce rate above 5% — custom domain at risk of being disabled.
+**Symptoms:** ZavaAdmin shows email bounce rate above 5% — custom domain at risk of being disabled.
 
 **Common Causes:**
 - Stale user accounts with invalid email addresses
@@ -97,7 +97,7 @@ DNS changes may take up to 48 hours to propagate. Common timeline:
 - Typos in email addresses during bulk user import
 
 **Resolution Steps:**
-1. Review bounce list: NimbusAdmin > Settings > Email > Bounce Report
+1. Review bounce list: ZavaAdmin > Settings > Email > Bounce Report
 2. Deactivate or correct user accounts with invalid emails
 3. Re-verify email addresses for bounced recipients
 4. Clean up user accounts synced from stale directory sources
@@ -107,14 +107,14 @@ DNS changes may take up to 48 hours to propagate. Common timeline:
 ### Per-Product Notification Controls
 | Product | Available Notifications | Default |
 |---------|----------------------|---------|
-| NimbusHub | Mentions, DMs, channel updates | On (mentions + DMs), Off (channel) |
-| NimbusDocs | Shares, comments, edit suggestions | On (all) |
-| NimbusBoard | Task assignments, due dates, status changes | On (assignments + due dates) |
-| NimbusConnect | Meeting invites, recordings ready | On (all) |
-| NimbusID | Security alerts, login from new device | On (all) — cannot disable |
+| ZavaHub | Mentions, DMs, channel updates | On (mentions + DMs), Off (channel) |
+| ZavaDocs | Shares, comments, edit suggestions | On (all) |
+| ZavaBoard | Task assignments, due dates, status changes | On (assignments + due dates) |
+| ZavaConnect | Meeting invites, recordings ready | On (all) |
+| ZavaID | Security alerts, login from new device | On (all) — cannot disable |
 
 ### Admin Notification Policies
-Admins can enforce notification baselines: NimbusAdmin > Settings > Notifications > Policies
+Admins can enforce notification baselines: ZavaAdmin > Settings > Notifications > Policies
 - **Require security notifications** — cannot be disabled by users
 - **Set quiet hours** — no notifications between specified hours (except security alerts)
 - **Batch digest** — combine multiple notifications into a single hourly or daily digest
@@ -129,5 +129,5 @@ Admins can enforce notification baselines: NimbusAdmin > Settings > Notification
 
 ## Related Articles
 - KB-015: Custom Notification Sender Address Configuration
-- KB-004: NimbusAdmin Tenant and User Provisioning
+- KB-004: ZavaAdmin Tenant and User Provisioning
 - KB-008: MFA Setup and Troubleshooting

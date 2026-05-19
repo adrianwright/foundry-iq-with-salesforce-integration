@@ -1,9 +1,9 @@
 # Azure Developer CLI (azd) configuration
 # Run `azd provision` to deploy infrastructure
 
-name: nimbus-helpdesk-demo
+name: zava-helpdesk-demo
 metadata:
-  template: nimbus-helpdesk-demo@0.0.1
+  template: zava-helpdesk-demo@0.0.1
 
 # Infrastructure configuration
 infra:

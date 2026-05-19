@@ -1,5 +1,5 @@
 // ============================================================================
-// NimbusCloud Helpdesk Demo - Azure API Management (APIM) Instance
+// ZavaCloud Helpdesk Demo - Azure API Management (APIM) Instance
 // Exposes CRM Case Creation as a NATIVE MCP Server
 // Uses "REST API as MCP server" feature — API operations become MCP tools
 // ============================================================================
@@ -19,6 +19,9 @@ param salesforceClientSecret string
 @description('Salesforce OAuth Token Endpoint')
 param salesforceTokenEndpoint string
 
+@description('Resource ID of the Log Analytics workspace to send APIM diagnostics to.')
+param logAnalyticsWorkspaceId string = ''
+
 // ============================================================================
 // APIM Instance
 // ============================================================================
@@ -35,7 +38,7 @@ resource apim 'Microsoft.ApiManagement/service@2024-06-01-preview' = {
   }
   properties: {
     publisherEmail: 'admin@${environmentName}.local'
-    publisherName: 'NimbusCloud Helpdesk Demo'
+    publisherName: 'ZavaCloud Helpdesk Demo'
   }
 }
 
@@ -165,7 +168,15 @@ resource salesforceApi 'Microsoft.ApiManagement/service/apis@2024-06-01-preview'
   dependsOn: [ namedValueClientId, namedValueClientSecret, namedValueTokenEndpoint ]
 }
 
-// Schema for the Create Case request body (used by MCP tool to generate input parameters)
+// Schema for the Create Case request body.
+//
+// IMPORTANT: APIM's MCP runtime (as of 2024-06-01-preview) does NOT correctly
+// marshal multi-property tool argument objects into the synthetic backend
+// request body — it serializes only the last property's raw value. To work
+// around this, the tool exposes a SINGLE required string argument `caseJson`
+// whose value is a JSON object (as a string) containing the real Salesforce
+// Case fields. The operation policy parses that string and constructs the
+// Salesforce payload server-side.
 resource createCaseSchema 'Microsoft.ApiManagement/service/apis/schemas@2024-06-01-preview' = {
   parent: salesforceApi
   name: 'create-case-schema'
@@ -177,31 +188,12 @@ resource createCaseSchema 'Microsoft.ApiManagement/service/apis/schemas@2024-06-
           CreateCaseRequest: {
             type: 'object'
             properties: {
-              subject: {
+              caseJson: {
                 type: 'string'
-                description: 'Brief summary of the case issue (required, max 100 chars)'
-              }
-              description: {
-                type: 'string'
-                description: 'Detailed description of the case including any relevant KB article references'
-              }
-              priority: {
-                type: 'string'
-                enum: ['Low', 'Medium', 'High']
-                description: 'Case priority based on urgency. Default: Medium'
-              }
-              origin: {
-                type: 'string'
-                enum: ['Web', 'Phone', 'Email']
-                description: 'How the case was submitted. Default: Web'
-              }
-              status: {
-                type: 'string'
-                enum: ['New', 'Working', 'Escalated']
-                description: 'Initial case status. Default: New'
+                description: 'REQUIRED. A JSON object (as a string) with the Salesforce Case fields. Must include "subject" (required). Optional: "description", "priority" (Low|Medium|High), "origin" (Web|Phone|Email), "status" (New|Working|Escalated). Example: {"subject":"VPN timeout","description":"User cannot connect to corporate VPN. See KB-001.","priority":"High","origin":"Web"}'
               }
             }
-            required: ['subject']
+            required: ['caseJson']
           }
         }
       }
@@ -257,7 +249,47 @@ resource createCasePolicy 'Microsoft.ApiManagement/service/apis/operations/polic
     value: '''<policies>
   <inbound>
     <base />
-    <!-- Step 1: Get Salesforce OAuth token -->
+    <!-- Step 1: Capture raw request body. When called via MCP, this is the
+         raw string value of the caseJson argument (a JSON object). When
+         called via direct REST, this is the JSON object containing caseJson. -->
+    <set-variable name="rawBody" value="@(context.Request.Body?.As<string>(preserveContent: true) ?? "")" />
+    <!-- Step 2: Defensively parse to extract the case fields. Handles three shapes:
+         (a) raw JSON object body (direct REST or MCP-stripped),
+         (b) JSON object wrapped in caseJson property (direct REST with full schema),
+         (c) double-quoted JSON string (some MCP transports). -->
+    <set-variable name="caseObj" value="@{
+      var raw = ((string)context.Variables["rawBody"]).Trim();
+      JObject src = null;
+      if (!string.IsNullOrEmpty(raw)) {
+        try {
+          if (raw.StartsWith("{")) {
+            var outer = JObject.Parse(raw);
+            if (outer["caseJson"] != null && outer["caseJson"].Type == JTokenType.String) {
+              try { src = JObject.Parse((string)outer["caseJson"]); } catch { src = outer; }
+            } else {
+              src = outer;
+            }
+          } else if (raw.StartsWith("\"")) {
+            var unq = Newtonsoft.Json.JsonConvert.DeserializeObject<string>(raw);
+            if (unq != null && unq.Trim().StartsWith("{")) { src = JObject.Parse(unq); }
+          }
+        } catch { src = null; }
+      }
+      if (src == null) { src = new JObject(); }
+      var subj = (string)src["subject"] ?? (string)src["Subject"] ?? "No subject provided";
+      var desc = (string)src["description"] ?? (string)src["Description"] ?? "";
+      var prio = (string)src["priority"] ?? (string)src["Priority"] ?? "Medium";
+      var orig = (string)src["origin"] ?? (string)src["Origin"] ?? "Web";
+      var stat = (string)src["status"] ?? (string)src["Status"] ?? "New";
+      var sfCase = new JObject();
+      sfCase["Subject"] = subj;
+      if (!string.IsNullOrEmpty(desc)) { sfCase["Description"] = desc; }
+      sfCase["Priority"] = prio;
+      sfCase["Origin"] = orig;
+      sfCase["Status"] = stat;
+      return sfCase.ToString();
+    }" />
+    <!-- Step 3: Get Salesforce OAuth token -->
     <send-request mode="new" response-variable-name="sf-token-response" timeout="20" ignore-error="false">
       <set-url>{{salesforce-token-endpoint}}</set-url>
       <set-method>POST</set-method>
@@ -269,18 +301,7 @@ resource createCasePolicy 'Microsoft.ApiManagement/service/apis/operations/polic
     <set-variable name="sf-token-body" value="@(((IResponse)context.Variables["sf-token-response"]).Body.As<JObject>())" />
     <set-variable name="sf-access-token" value="@((string)((JObject)context.Variables["sf-token-body"])["access_token"])" />
     <set-variable name="sf-instance-url" value="@((string)((JObject)context.Variables["sf-token-body"])["instance_url"])" />
-    <!-- Step 2: Build Salesforce Case payload from request body -->
-    <set-variable name="sf-case-body" value="@{
-      var req = context.Request.Body.As<JObject>();
-      var sfCase = new JObject();
-      sfCase["Subject"] = (string)req["subject"] ?? "No subject";
-      if (req["description"] != null) { sfCase["Description"] = (string)req["description"]; }
-      sfCase["Priority"] = (string)req["priority"] ?? "Medium";
-      sfCase["Origin"] = (string)req["origin"] ?? "Web";
-      sfCase["Status"] = (string)req["status"] ?? "New";
-      return sfCase.ToString();
-    }" />
-    <!-- Step 3: POST to Salesforce -->
+    <!-- Step 4: POST to Salesforce -->
     <send-request mode="new" response-variable-name="sf-case-response" timeout="30" ignore-error="false">
       <set-url>@($"{(string)context.Variables["sf-instance-url"]}/services/data/v62.0/sobjects/Case")</set-url>
       <set-method>POST</set-method>
@@ -290,32 +311,33 @@ resource createCasePolicy 'Microsoft.ApiManagement/service/apis/operations/polic
       <set-header name="Content-Type" exists-action="override">
         <value>application/json</value>
       </set-header>
-      <set-body>@((string)context.Variables["sf-case-body"])</set-body>
+      <set-body>@((string)context.Variables["caseObj"])</set-body>
     </send-request>
-    <!-- Step 4: Return response -->
+    <!-- Step 5: Return response -->
     <return-response>
-      <set-status code="@(((IResponse)context.Variables["sf-case-response"]).StatusCode)" />
+      <set-status code="200" reason="OK" />
       <set-header name="Content-Type" exists-action="override">
         <value>application/json</value>
       </set-header>
       <set-body>@{
-        var sfResp = ((IResponse)context.Variables["sf-case-response"]);
-        var sfBody = sfResp.Body.As<JObject>();
-        var statusCode = sfResp.StatusCode;
-        
-        if (statusCode >= 200 && statusCode < 300) {
-          return new JObject(
-            new JProperty("success", true),
-            new JProperty("case_id", (string)sfBody["id"]),
-            new JProperty("message", "Case created successfully in Salesforce")
-          ).ToString();
-        } else {
-          return new JObject(
-            new JProperty("success", false),
-            new JProperty("error", sfBody.ToString()),
-            new JProperty("status_code", statusCode)
-          ).ToString();
+        var sfResp = (IResponse)context.Variables["sf-case-response"];
+        var status = sfResp.StatusCode;
+        JObject sfBody = null;
+        try { sfBody = sfResp.Body.As<JObject>(preserveContent: true); } catch { sfBody = null; }
+        if (sfBody == null) {
+          try {
+            var arr = sfResp.Body.As<JArray>(preserveContent: true);
+            sfBody = new JObject(new JProperty("response", arr));
+          } catch { sfBody = new JObject(new JProperty("response", sfResp.Body.As<string>(preserveContent: true))); }
         }
+        var ok = status >= 200 && status < 300;
+        var result = new JObject();
+        result["success"] = ok;
+        result["sf_status"] = status;
+        if (ok && sfBody["id"] != null) { result["case_id"] = sfBody["id"]; }
+        result["sf_response"] = sfBody;
+        result["sent_case"] = JObject.Parse((string)context.Variables["caseObj"]);
+        return result.ToString();
       }</set-body>
     </return-response>
   </inbound>
@@ -364,6 +386,25 @@ resource foundrySubscription 'Microsoft.ApiManagement/service/subscriptions@2024
     displayName: 'Foundry Agent Subscription'
     scope: '/products/${foundryProduct.name}'
     state: 'active'
+  }
+}
+
+// ============================================================================
+// Diagnostic Settings (send GatewayLogs + metrics to Log Analytics)
+// ============================================================================
+
+resource apimDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = if (!empty(logAnalyticsWorkspaceId)) {
+  name: 'apim-diag'
+  scope: apim
+  properties: {
+    workspaceId: logAnalyticsWorkspaceId
+    logs: [
+      { category: 'GatewayLogs', enabled: true }
+      { category: 'WebSocketConnectionLogs', enabled: true }
+    ]
+    metrics: [
+      { category: 'AllMetrics', enabled: true }
+    ]
   }
 }
 

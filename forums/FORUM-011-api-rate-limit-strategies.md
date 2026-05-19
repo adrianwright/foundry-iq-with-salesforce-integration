@@ -2,15 +2,15 @@
 
 **Article Number**: FORUM-011  
 **Category**: API & Developer  
-**Product**: NimbusAPI
+**Product**: ZavaAPI
 
 ---
 
-## Thread: Hitting NimbusAPI rate limits during nightly sync — how do you handle 25,000+ API calls?
+## Thread: Hitting ZavaAPI rate limits during nightly sync — how do you handle 25,000+ API calls?
 
 **Posted by:** @AlexD_Developer | February 14, 2026
 
-We run a nightly sync that provisions NimbusCloud accounts for enrolled students (higher ed). The job makes about 25,000 individual API calls to create/update users and consistently hits the 300 requests/minute limit on our Business plan. We get thousands of 429 errors. How are others handling high-volume API integrations?
+We run a nightly sync that provisions ZavaCloud accounts for enrolled students (higher ed). The job makes about 25,000 individual API calls to create/update users and consistently hits the 300 requests/minute limit on our Business plan. We get thousands of 429 errors. How are others handling high-volume API integrations?
 
 ---
 
@@ -108,4 +108,4 @@ KB-011 has the full API rate limit documentation and integration best practices.
 
 **Posted by:** @API_Guru_Samira | February 20, 2026
 
-Nice implementation! One more optimization — use the `ETag` and `If-None-Match` headers for your GET requests. NimbusAPI supports conditional requests, so if a resource hasn't changed, you get a 304 Not Modified (doesn't count against your rate limit). Perfect for your polling backup job.
+Nice implementation! One more optimization — use the `ETag` and `If-None-Match` headers for your GET requests. ZavaAPI supports conditional requests, so if a resource hasn't changed, you get a 304 Not Modified (doesn't count against your rate limit). Perfect for your polling backup job.

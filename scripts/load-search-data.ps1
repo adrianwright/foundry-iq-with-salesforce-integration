@@ -24,14 +24,32 @@ Write-Host ""
 Write-Host "Resolving resources in '$ResourceGroup'..." -ForegroundColor Yellow
 $subscriptionId = az account show --query id -o tsv
 $searchName = az resource list -g $ResourceGroup --resource-type "Microsoft.Search/searchServices" --query "[0].name" -o tsv
+$aoaiName = az resource list -g $ResourceGroup --resource-type "Microsoft.CognitiveServices/accounts" --query "[0].name" -o tsv
 
 if (-not $searchName) {
     Write-Host "ERROR: No AI Search service found in '$ResourceGroup'." -ForegroundColor Red
     exit 1
 }
+if (-not $aoaiName) {
+    Write-Host "ERROR: No Cognitive Services / AI Services account found in '$ResourceGroup'." -ForegroundColor Red
+    exit 1
+}
 
 $searchScope = "/subscriptions/$subscriptionId/resourceGroups/$ResourceGroup/providers/Microsoft.Search/searchServices/$searchName"
+$aoaiScope = "/subscriptions/$subscriptionId/resourceGroups/$ResourceGroup/providers/Microsoft.CognitiveServices/accounts/$aoaiName"
 Write-Host "  Search Service: $searchName" -ForegroundColor Gray
+Write-Host "  AI Services:    $aoaiName" -ForegroundColor Gray
+
+# --- Validate embedding model deployment ---
+Write-Host ""
+Write-Host "Validating embedding model deployment..." -ForegroundColor Yellow
+$embedding = az cognitiveservices account deployment list --name $aoaiName --resource-group $ResourceGroup --query "[?properties.model.name=='text-embedding-3-small'].name" -o tsv
+if (-not $embedding) {
+    Write-Host "ERROR: No 'text-embedding-3-small' deployment found on '$aoaiName'." -ForegroundColor Red
+    Write-Host "       Create one via the Foundry/AOAI portal or Bicep before running this script." -ForegroundColor Red
+    exit 1
+}
+Write-Host "  text-embedding-3-small [present]" -ForegroundColor Green
 
 # --- Assign RBAC roles ---
 Write-Host ""
@@ -39,25 +57,30 @@ Write-Host "Assigning RBAC roles to current user..." -ForegroundColor Yellow
 $userPrincipal = az ad signed-in-user show --query id -o tsv
 Write-Host "  User: $userPrincipal" -ForegroundColor Gray
 
-$roles = @(
-    "Search Service Contributor",
-    "Search Index Data Contributor"
+# Note: AI Services (kind=AIServices) data plane requires all three Cognitive roles below.
+# 'Cognitive Services OpenAI User' alone returns 401 PermissionDenied on /embeddings.
+$roleAssignments = @(
+    @{ Role = "Search Service Contributor";       Scope = $searchScope },
+    @{ Role = "Search Index Data Contributor";    Scope = $searchScope },
+    @{ Role = "Cognitive Services OpenAI User";   Scope = $aoaiScope },
+    @{ Role = "Cognitive Services User";          Scope = $aoaiScope },
+    @{ Role = "Azure AI Developer";               Scope = $aoaiScope }
 )
 
-foreach ($role in $roles) {
-    $existing = az role assignment list --assignee $userPrincipal --role $role --scope $searchScope -o json 2>$null | ConvertFrom-Json
+foreach ($ra in $roleAssignments) {
+    $existing = az role assignment list --assignee $userPrincipal --role $ra.Role --scope $ra.Scope -o json 2>$null | ConvertFrom-Json
     if ($existing.Count -gt 0) {
-        Write-Host "  $role [already assigned]" -ForegroundColor DarkGray
+        Write-Host "  $($ra.Role) [already assigned]" -ForegroundColor DarkGray
     } else {
-        az role assignment create --assignee-object-id $userPrincipal --assignee-principal-type User --role $role --scope $searchScope -o none 2>$null
-        Write-Host "  $role [assigned]" -ForegroundColor Green
+        az role assignment create --assignee-object-id $userPrincipal --assignee-principal-type User --role $ra.Role --scope $ra.Scope -o none 2>$null
+        Write-Host "  $($ra.Role) [assigned]" -ForegroundColor Green
     }
 }
 
-# Wait briefly for RBAC propagation
+# RBAC propagation: AI Services data plane is slower than ARM (often 2-3 min).
 Write-Host ""
-Write-Host "Waiting 30s for RBAC propagation..." -ForegroundColor Yellow
-Start-Sleep -Seconds 30
+Write-Host "Waiting 180s for RBAC propagation (AI Services data plane is slower than ARM)..." -ForegroundColor Yellow
+Start-Sleep -Seconds 180
 
 # --- Install Python dependencies ---
 Write-Host ""

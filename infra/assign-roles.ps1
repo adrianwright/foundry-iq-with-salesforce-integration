@@ -41,6 +41,14 @@ Write-Host "`nAssigning roles..." -ForegroundColor Cyan
 # AI Foundry -> Search
 Assign-Role $aiFoundryPrincipal "ServicePrincipal" "Search Index Data Contributor" $searchScope "AI Foundry -> Search Index Data Contributor"
 
+# Search MI -> AI Foundry: Cognitive Services OpenAI User
+# Required so the Search service can call AOAI chat/completions for the Foundry
+# knowledge base's model query planning + semantic ranking inside knowledge_base_retrieve.
+# This is the ONLY role required for AAD inference.
+$searchPrincipal = az resource list -g $rg --resource-type "Microsoft.Search/searchServices" --query "[0].identity.principalId" -o tsv
+Write-Host "  Search:      $searchPrincipal" -ForegroundColor Gray
+Assign-Role $searchPrincipal "ServicePrincipal" "Cognitive Services OpenAI User" $foundryScope "Search -> Cognitive Services OpenAI User"
+
 # AI Project -> Foundry
 Assign-Role $projectPrincipal "ServicePrincipal" "Azure AI User" $foundryScope "AI Project -> Azure AI User"
 Assign-Role $projectPrincipal "ServicePrincipal" "Azure AI Project Manager" $foundryScope "AI Project -> Azure AI Project Manager"

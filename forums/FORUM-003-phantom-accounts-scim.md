@@ -2,7 +2,7 @@
 
 **Article Number**: FORUM-003  
 **Category**: Identity & Provisioning  
-**Product**: NimbusID / NimbusAdmin
+**Product**: ZavaID / ZavaAdmin
 
 ---
 
@@ -10,7 +10,7 @@
 
 **Posted by:** @DavidC_DirServices | January 28, 2026
 
-After migrating our directory from on-prem AD to Entra ID, we discovered 47 phantom user accounts in NimbusAdmin that shouldn't exist. They appear to be duplicates of real users but with different email formats (firstname.lastname@ vs flastname@). Our SCIM connector is creating new accounts instead of updating existing ones when the UPN format changes. Has anyone dealt with this?
+After migrating our directory from on-prem AD to Entra ID, we discovered 47 phantom user accounts in ZavaAdmin that shouldn't exist. They appear to be duplicates of real users but with different email formats (firstname.lastname@ vs flastname@). Our SCIM connector is creating new accounts instead of updating existing ones when the UPN format changes. Has anyone dealt with this?
 
 ---
 
@@ -23,7 +23,7 @@ Yes, this is a classic SCIM matching issue. Most SCIM connectors default to matc
 **The fix:** Change your SCIM connector's matching attribute from `userName` to `externalId`. In Azure/Entra ID, `externalId` maps to the Object ID which is immutable — it never changes regardless of UPN changes.
 
 In your Entra ID SCIM provisioning config:
-1. Go to Enterprise Applications > NimbusCloud > Provisioning > Edit Attribute Mappings
+1. Go to Enterprise Applications > ZavaCloud > Provisioning > Edit Attribute Mappings
 2. Find the mapping for `externalId` — ensure it maps to `objectId`
 3. Set the matching precedence to use `externalId` first (not `userName`)
 
@@ -33,22 +33,22 @@ In your Entra ID SCIM provisioning config:
 
 **Posted by:** @DavidC_DirServices | January 29, 2026
 
-@IAM_Specialist_Ravi That makes sense. Before I change the matching attribute — how do I clean up the 47 phantom accounts? Some of them have actually been used (people logged in with the wrong account and created documents in NimbusDocs).
+@IAM_Specialist_Ravi That makes sense. Before I change the matching attribute — how do I clean up the 47 phantom accounts? Some of them have actually been used (people logged in with the wrong account and created documents in ZavaDocs).
 
 ---
 
 ### Reply 3
 
-**Posted by:** @NimbusAdmin_Pro | January 29, 2026
+**Posted by:** @ZavaAdmin_Pro | January 29, 2026
 
 For cleanup, you need to merge the phantom accounts into the real accounts:
 
-1. **NimbusAdmin > Users** — search for each phantom account
+1. **ZavaAdmin > Users** — search for each phantom account
 2. Check if the phantom account has any data (files, messages, task assignments)
 3. If it has data: Select both the phantom and real account > click **Merge Accounts** — this transfers all data from the phantom to the real account
 4. If it's empty: Just delete it
 
-For 47 accounts, I'd use the NimbusAPI to script this instead of doing it manually. Here's a rough approach:
+For 47 accounts, I'd use the ZavaAPI to script this instead of doing it manually. Here's a rough approach:
 
 ```python
 # For each phantom account, check for content and merge or delete
@@ -66,7 +66,7 @@ for phantom in phantom_accounts:
 
 **Posted by:** @DavidC_DirServices | February 3, 2026
 
-Update: Followed the advice here and in CASE-003 that NimbusCloud support helped with. Here's the full resolution:
+Update: Followed the advice here and in CASE-003 that ZavaCloud support helped with. Here's the full resolution:
 
 1. Changed SCIM matching from `userName` to `externalId` ✅
 2. Merged 9 phantom accounts that had data ✅
@@ -81,7 +81,7 @@ Update: Followed the advice here and in CASE-003 that NimbusCloud support helped
 
 **Posted by:** @IAM_Specialist_Ravi | February 3, 2026
 
-Glad it worked out. I'd also recommend submitting a feature request to NimbusCloud for fuzzy duplicate detection during SCIM provisioning. Something like "Warning: New user `jane.doe@company.com` closely matches existing user `jdoe@company.com` — potential duplicate" would catch this before it becomes a cleanup project.
+Glad it worked out. I'd also recommend submitting a feature request to ZavaCloud for fuzzy duplicate detection during SCIM provisioning. Something like "Warning: New user `jane.doe@company.com` closely matches existing user `jdoe@company.com` — potential duplicate" would catch this before it becomes a cleanup project.
 
 ---
 

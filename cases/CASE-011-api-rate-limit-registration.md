@@ -3,7 +3,7 @@
 **Case Number**: CASE-011  
 **Status**: Escalated  
 **Priority**: High  
-**Product**: NimbusAPI  
+**Product**: ZavaAPI  
 **Category**: API & Developer  
 **Origin**: Web  
 **Contact**: Alex Dubois, Lead Developer, Horizon University  
@@ -14,10 +14,10 @@
 ---
 
 ## Subject
-NimbusAPI returning 429 errors during nightly student registration sync — 15,000 API calls failing
+ZavaAPI returning 429 errors during nightly student registration sync — 15,000 API calls failing
 
 ## Description
-Alex Dubois reported that Horizon University's nightly student registration sync (which provisions NimbusCloud accounts for enrolled students) is hitting API rate limits. The sync job makes approximately 25,000 API calls to create and update user accounts but consistently gets throttled after 10,000 calls, causing 15,000 to fail with 429 Too Many Requests. The sync must complete within a 4-hour overnight window.
+Alex Dubois reported that Horizon University's nightly student registration sync (which provisions ZavaCloud accounts for enrolled students) is hitting API rate limits. The sync job makes approximately 25,000 API calls to create and update user accounts but consistently gets throttled after 10,000 calls, causing 15,000 to fail with 429 Too Many Requests. The sync must complete within a 4-hour overnight window.
 
 ## Investigation Notes
 
@@ -44,12 +44,12 @@ Alex Dubois reported that Horizon University's nightly student registration sync
 **2026-02-20 — Production Validation**
 - Full nightly sync ran successfully for 3 consecutive nights with zero rate limit errors
 - Average completion time: 48 minutes (down from 4+ hours with failures)
-- Alex requested a temporary rate limit increase for annual enrollment surge in August — escalated to NimbusCloud support for Enterprise plan evaluation
+- Alex requested a temporary rate limit increase for annual enrollment surge in August — escalated to ZavaCloud support for Enterprise plan evaluation
 
 ## Resolution
 Sync job refactored to use batch API endpoints (250 calls instead of 25,000) and exponential backoff with jitter. Rate limit errors eliminated. Escalated Enterprise plan evaluation for annual enrollment surge. KB-011 provides API rate limit and integration best practices.
 
 ## Related Articles
-- KB-011: NimbusAPI Rate Limits and Integration Best Practices
-- KB-004: NimbusAdmin Tenant and User Provisioning
+- KB-011: ZavaAPI Rate Limits and Integration Best Practices
+- KB-004: ZavaAdmin Tenant and User Provisioning
 - FORUM-011: API Rate Limit Strategies — Share Your Approach

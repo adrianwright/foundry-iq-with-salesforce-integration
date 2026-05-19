@@ -1,13 +1,13 @@
-# NimbusAPI Rate Limits and Integration Best Practices
+# ZavaAPI Rate Limits and Integration Best Practices
 
 **Article Number:** KB-011  
-**Product:** NimbusAPI  
+**Product:** ZavaAPI  
 **Category:** API & Developer  
 **Last Updated:** February 2026
 
 ## Overview
 
-NimbusAPI is the public REST API for the NimbusCloud platform. This article documents rate limits, throttling behavior, webhook configuration, retry strategies, and best practices for building reliable integrations.
+ZavaAPI is the public REST API for the ZavaCloud platform. This article documents rate limits, throttling behavior, webhook configuration, retry strategies, and best practices for building reliable integrations.
 
 ## API Rate Limits
 
@@ -48,11 +48,11 @@ When you exceed the rate limit:
 ## Webhook Configuration
 
 ### Setting Up Webhooks
-1. Navigate to NimbusAdmin > Settings > Apps > [your app] > Webhooks
+1. Navigate to ZavaAdmin > Settings > Apps > [your app] > Webhooks
 2. Click **Add Webhook Endpoint**
 3. Enter the **Endpoint URL** (must be HTTPS)
 4. Select **Events** to subscribe to (e.g., `user.created`, `file.uploaded`, `task.completed`)
-5. Click **Create** — NimbusCloud sends a verification `POST` with a challenge token
+5. Click **Create** — ZavaCloud sends a verification `POST` with a challenge token
 6. Your endpoint must respond with the challenge token to complete verification
 
 ### Available Webhook Events
@@ -65,9 +65,9 @@ When you exceed the rate limit:
 | Security | `security.login_failed`, `security.mfa_reset`, `security.api_key_rotated` |
 
 ### Webhook Reliability
-- NimbusCloud retries failed webhook deliveries up to 5 times with exponential backoff (1, 5, 25, 125, 625 seconds)
+- ZavaCloud retries failed webhook deliveries up to 5 times with exponential backoff (1, 5, 25, 125, 625 seconds)
 - Webhooks that fail consistently (>50% failure rate over 24 hours) are auto-disabled with an admin notification
-- Webhook payloads are signed with HMAC-SHA256 — verify the `X-NimbusCloud-Signature` header
+- Webhook payloads are signed with HMAC-SHA256 — verify the `X-ZavaCloud-Signature` header
 
 ## Integration Patterns
 
@@ -110,7 +110,7 @@ Batch endpoints count as a single rate-limited request regardless of items in th
 1. Implement exponential backoff with jitter (see code sample above)
 2. Use batch endpoints to reduce total request count
 3. Spread sync operations across larger time windows instead of bursting
-4. Contact NimbusCloud support to request a temporary rate limit increase for migration projects
+4. Contact ZavaCloud support to request a temporary rate limit increase for migration projects
 
 ### Authentication Token Expired
 **Symptoms:** API returns `401 Unauthorized` after working previously.
@@ -119,10 +119,10 @@ Batch endpoints count as a single rate-limited request regardless of items in th
 1. Check token expiration — access tokens expire after 1 hour
 2. Use the refresh token to obtain a new access token (see KB-006)
 3. For service accounts (client credentials), request a new token from the token endpoint
-4. Verify the client secret hasn't expired: NimbusAdmin > Apps > [app] > Credentials
+4. Verify the client secret hasn't expired: ZavaAdmin > Apps > [app] > Credentials
 
 ## API Versioning
-NimbusAPI uses URL-based versioning:
+ZavaAPI uses URL-based versioning:
 - **Current**: `/api/v2/` (stable, recommended)
 - **Legacy**: `/api/v1/` (deprecated, sunset December 2026)
 - **Preview**: `/api/preview/` (unstable, not for production)
@@ -134,9 +134,9 @@ NimbusAPI uses URL-based versioning:
 3. **Batch operations** where possible to maximize throughput within rate limits
 4. **Cache responses** for read-heavy workloads — use `ETag` and `If-None-Match` headers
 5. **Migrate to v2 API** before the v1 sunset date
-6. **Monitor your usage** — NimbusAdmin > Apps > [app] > Usage Dashboard shows daily request counts
+6. **Monitor your usage** — ZavaAdmin > Apps > [app] > Usage Dashboard shows daily request counts
 
 ## Related Articles
 - KB-006: OAuth 2.0 and OIDC Integration Troubleshooting
-- KB-004: NimbusAdmin Tenant and User Provisioning
+- KB-004: ZavaAdmin Tenant and User Provisioning
 - KB-012: System Maintenance and Incident Response Playbook

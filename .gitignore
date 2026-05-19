@@ -35,3 +35,9 @@ logs/
 
 # Deployment outputs
 infra/deployment-outputs.json
+
+# APIM scratch files (created by ad-hoc az rest calls)
+policy.json
+policy-body.json
+schema.json
+mcp-test.txt

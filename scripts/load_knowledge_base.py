@@ -137,7 +137,7 @@ def parse_markdown_file(file_path: Path) -> dict:
     
     # Extract product
     product_match = re.search(r'\*\*Product:\*\*\s*(.+?)(?:\s{2}|\n)', content)
-    product = product_match.group(1).strip() if product_match else "NimbusCloud"
+    product = product_match.group(1).strip() if product_match else "ZavaCloud"
     
     # Extract category
     category_match = re.search(r'\*\*Category:\*\*\s*(.+?)(?:\s{2}|\n)', content)
@@ -207,7 +207,7 @@ def load_documents(credential, openai_client):
 
 def main():
     print("=" * 60)
-    print("NimbusCloud Knowledge Base Loader")
+    print("ZavaCloud Knowledge Base Loader")
     print("=" * 60)
     print(f"OpenAI Endpoint: {AZURE_OPENAI_ENDPOINT}")
     print(f"Search Endpoint: {AZURE_SEARCH_ENDPOINT}")

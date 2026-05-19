@@ -1,5 +1,5 @@
 """
-Create the NimbusCloud IT Helpdesk agent in Azure AI Foundry.
+Create the ZavaCloud IT Helpdesk agent in Azure AI Foundry.
 
 Uses the Azure AI Projects SDK v2 (azure-ai-projects 2.x) with the new
 Foundry Agents API (create_version / PromptAgentDefinition).
@@ -9,7 +9,7 @@ Usage:
 
 Environment variables (from .env):
     AZURE_AI_PROJECT_ENDPOINT  - AI Foundry project endpoint
-    AZURE_OPENAI_DEPLOYMENT    - Model deployment name (e.g. gpt-5.2)
+    AZURE_OPENAI_DEPLOYMENT    - Model deployment name (e.g. gpt-5.4)
 """
 
 import os
@@ -28,11 +28,11 @@ from azure.ai.projects.models import PromptAgentDefinition, MCPTool
 load_dotenv(Path(__file__).resolve().parent.parent / ".env")
 
 PROJECT_ENDPOINT = os.environ.get("AZURE_AI_PROJECT_ENDPOINT", "")
-MODEL_DEPLOYMENT = os.environ.get("AZURE_OPENAI_DEPLOYMENT", "gpt-5.2")
+MODEL_DEPLOYMENT = os.environ.get("AZURE_OPENAI_DEPLOYMENT", "gpt-5.4")
 SEARCH_ENDPOINT = os.environ.get("AZURE_SEARCH_ENDPOINT", "")
-KB_NAME = os.environ.get("AZURE_KB_NAME", "knowledgebase314")
-KB_CONNECTION_NAME = os.environ.get("AZURE_KB_CONNECTION", "kb-knowledgebase314-56yau")
-AGENT_NAME = "nimbuscloud-it-support-agent"
+KB_NAME = os.environ.get("AZURE_KB_NAME", "")
+KB_CONNECTION_NAME = os.environ.get("AZURE_KB_CONNECTION", "")
+AGENT_NAME = "ZavaCloud-it-support-agent"
 
 INSTRUCTIONS_FILE = Path(__file__).resolve().parent.parent / "AGENT_INSTRUCTIONS.md"
 
@@ -46,6 +46,10 @@ def validate():
         errors.append("AZURE_AI_PROJECT_ENDPOINT is not set")
     if not SEARCH_ENDPOINT:
         errors.append("AZURE_SEARCH_ENDPOINT is not set")
+    if not KB_NAME:
+        errors.append("AZURE_KB_NAME is not set (the Foundry IQ knowledge base name)")
+    if not KB_CONNECTION_NAME:
+        errors.append("AZURE_KB_CONNECTION is not set (the project connection ID/name for the KB)")
     if not INSTRUCTIONS_FILE.exists():
         errors.append(f"Instructions file not found: {INSTRUCTIONS_FILE}")
     if errors:
@@ -62,7 +66,7 @@ def main():
     validate()
 
     print("=" * 60)
-    print("NimbusCloud Agent Creator (Foundry Agents API v2)")
+    print("ZavaCloud Agent Creator (Foundry Agents API v2)")
     print("=" * 60)
     print(f"Project Endpoint: {PROJECT_ENDPOINT}")
     print(f"Model Deployment: {MODEL_DEPLOYMENT}")

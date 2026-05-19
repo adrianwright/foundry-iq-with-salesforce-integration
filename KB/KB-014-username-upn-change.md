@@ -1,22 +1,22 @@
 # Username and UPN Change Procedure
 
 **Article Number:** KB-014  
-**Product:** NimbusID / NimbusAdmin  
+**Product:** ZavaID / ZavaAdmin  
 **Category:** Identity & User Management  
 **Last Updated:** February 2026
 
 ## Overview
 
-This article covers the procedure for changing a user's username (email/UPN) in NimbusCloud, including the impact on SSO, SCIM provisioning, API tokens, and cross-product references. Username changes are common during name changes, corporate rebranding, and domain migrations.
+This article covers the procedure for changing a user's username (email/UPN) in ZavaCloud, including the impact on SSO, SCIM provisioning, API tokens, and cross-product references. Username changes are common during name changes, corporate rebranding, and domain migrations.
 
-## How Usernames Work in NimbusCloud
+## How Usernames Work in ZavaCloud
 
 ### Identity Fields
 | Field | Description | Mutable | Used For |
 |-------|-------------|---------|----------|
 | **User ID** | Internal UUID, system-generated | No — immutable | API references, audit logs, internal cross-references |
 | **Username / UPN** | Email address (e.g., `jane@company.com`) | Yes | Login, display, email notifications |
-| **External ID** | IdP-assigned identifier (e.g., SCIM `externalId`) | Yes (via SCIM only) | IdP-to-NimbusCloud user matching |
+| **External ID** | IdP-assigned identifier (e.g., SCIM `externalId`) | Yes (via SCIM only) | IdP-to-ZavaCloud user matching |
 | **Display Name** | First + Last name | Yes | UI display, @mentions |
 
 ### Key Principle
@@ -25,7 +25,7 @@ This article covers the procedure for changing a user's username (email/UPN) in 
 ## Username Change Methods
 
 ### Method 1: Admin Manual Change
-1. Navigate to NimbusAdmin > Users > search for the user
+1. Navigate to ZavaAdmin > Users > search for the user
 2. Click the user profile > Edit
 3. Update the **Email / UPN** field
 4. Click Save — the change takes effect immediately
@@ -35,17 +35,17 @@ This article covers the procedure for changing a user's username (email/UPN) in 
 ### Method 2: SCIM-Driven Change
 If SCIM provisioning is configured (see KB-004):
 1. Update the user's email/UPN in your IdP (Azure AD, Okta, etc.)
-2. SCIM sync propagates the change to NimbusCloud automatically (5-40 minute delay)
-3. No action needed in NimbusAdmin — the sync handles the update
-4. Verify in NimbusAdmin > Users > [user] > Provisioning Log
+2. SCIM sync propagates the change to ZavaCloud automatically (5-40 minute delay)
+3. No action needed in ZavaAdmin — the sync handles the update
+4. Verify in ZavaAdmin > Users > [user] > Provisioning Log
 
 ### Method 3: Bulk Username Change (Domain Migration)
 For changing all users from `@oldomain.com` to `@newdomain.com`:
-1. Navigate to NimbusAdmin > Settings > Identity > Domain Migration
+1. Navigate to ZavaAdmin > Settings > Identity > Domain Migration
 2. Enter the old domain and new domain
 3. Preview the affected users (review carefully before proceeding)
 4. Click **Start Migration** — changes are applied in batches
-5. Monitor progress in NimbusAdmin > Settings > Identity > Migration Status
+5. Monitor progress in ZavaAdmin > Settings > Identity > Migration Status
 
 ## Impact of Username Change
 
@@ -53,10 +53,10 @@ For changing all users from `@oldomain.com` to `@newdomain.com`:
 | System | Behavior |
 |--------|----------|
 | Login | New email required immediately |
-| NimbusHub | @mentions show new display name; old messages retain context |
-| NimbusDocs | File ownership transfers seamlessly (via User ID) |
-| NimbusBoard | Task assignments preserved (via User ID) |
-| NimbusVault | File permissions preserved (via User ID) |
+| ZavaHub | @mentions show new display name; old messages retain context |
+| ZavaDocs | File ownership transfers seamlessly (via User ID) |
+| ZavaBoard | Task assignments preserved (via User ID) |
+| ZavaVault | File permissions preserved (via User ID) |
 | Audit logs | Historical entries retain the original username for accuracy |
 | SCIM | ExternalID updated if IdP propagates the change |
 
@@ -67,18 +67,18 @@ For changing all users from `@oldomain.com` to `@newdomain.com`:
 | OAuth tokens | Existing tokens remain valid until expiry; no action needed |
 | Shared links | Links use file ID, not username — no impact |
 | External integrations | API calls using the old email as a parameter (e.g., `?email=old@company.com`) must be updated |
-| Calendar invitations | Pending NimbusConnect meeting invites sent to old email won't forward — resend if needed |
+| Calendar invitations | Pending ZavaConnect meeting invites sent to old email won't forward — resend if needed |
 
 ## Common Issues
 
 ### SSO Fails After Username Change
-**Symptoms:** User can't log in via SSO after their email was changed in NimbusCloud but not in the IdP.
+**Symptoms:** User can't log in via SSO after their email was changed in ZavaCloud but not in the IdP.
 
 **Resolution:**
-1. Ensure the IdP NameID matches the new NimbusCloud email
+1. Ensure the IdP NameID matches the new ZavaCloud email
 2. If using SCIM, wait for the sync cycle to update both systems
 3. If NameID uses a persistent ID (not email), no change is needed in the IdP
-4. Check NimbusAdmin > Users > [user] > SSO Status for errors
+4. Check ZavaAdmin > Users > [user] > SSO Status for errors
 
 ### SCIM Sync Creates Duplicate User
 **Symptoms:** After changing a username in the IdP, SCIM creates a new user instead of updating the existing one.
@@ -89,7 +89,7 @@ For changing all users from `@oldomain.com` to `@newdomain.com`:
 
 **Resolution:**
 1. Configure the SCIM connector to match on `externalId` (immutable) instead of `userName`
-2. Delete the duplicate user in NimbusAdmin
+2. Delete the duplicate user in ZavaAdmin
 3. Verify the original user's `externalId` matches the IdP record
 4. Re-run a SCIM sync to verify correct matching
 
@@ -103,5 +103,5 @@ For changing all users from `@oldomain.com` to `@newdomain.com`:
 
 ## Related Articles
 - KB-003: SSO and SAML Configuration Guide
-- KB-004: NimbusAdmin Tenant and User Provisioning
+- KB-004: ZavaAdmin Tenant and User Provisioning
 - KB-008: MFA Setup and Troubleshooting

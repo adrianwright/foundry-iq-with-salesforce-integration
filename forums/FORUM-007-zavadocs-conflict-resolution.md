@@ -1,16 +1,16 @@
-# Community Forum: NimbusDocs Conflict Resolution Frustrations
+# Community Forum: ZavaDocs Conflict Resolution Frustrations
 
 **Article Number**: FORUM-007  
 **Category**: Document Management & Sync  
-**Product**: NimbusDocs
+**Product**: ZavaDocs
 
 ---
 
-## Thread: NimbusDocs lost my offline edits — no conflict copy created. Happened to 15 people.
+## Thread: ZavaDocs lost my offline edits — no conflict copy created. Happened to 15 people.
 
 **Posted by:** @AngelaM_BrightPath | February 7, 2026
 
-Our team was editing training documents on a cross-country flight. When we landed and reconnected to Wi-Fi, all our offline edits just... vanished. No conflict copies, no error messages. 15 people lost work. We're on NimbusDocs Desktop Client v4.1.3 on Windows 11. This is unacceptable. Is there any way to recover our work?
+Our team was editing training documents on a cross-country flight. When we landed and reconnected to Wi-Fi, all our offline edits just... vanished. No conflict copies, no error messages. 15 people lost work. We're on ZavaDocs Desktop Client v4.1.3 on Windows 11. This is unacceptable. Is there any way to recover our work?
 
 ---
 
@@ -24,9 +24,9 @@ I've seen this before — v4.1.3 has a bug where offline edits are silently disc
 
 **For data recovery:** Your edits might still be in the local cache. Check:
 ```
-%APPDATA%\NimbusDocs\sync\deltas\
+%APPDATA%\ZavaDocs\sync\deltas\
 ```
-If you find `.delta` files with timestamps matching your flight, NimbusDocs support can help extract them.
+If you find `.delta` files with timestamps matching your flight, ZavaDocs support can help extract them.
 
 ---
 
@@ -34,7 +34,7 @@ If you find `.delta` files with timestamps matching your flight, NimbusDocs supp
 
 **Posted by:** @AngelaM_BrightPath | February 8, 2026
 
-@DocSync_Expert_Tom I checked the deltas folder — found delta files for 8 of the 15 users! The other 7 had already been cleared by auto-cleanup (it runs when the client starts with a fresh sync). NimbusCloud support (CASE-007) helped us extract and reapply the deltas for the 8 users. Still lost work for 7 people though.
+@DocSync_Expert_Tom I checked the deltas folder — found delta files for 8 of the 15 users! The other 7 had already been cleared by auto-cleanup (it runs when the client starts with a fresh sync). ZavaCloud support (CASE-007) helped us extract and reapply the deltas for the 8 users. Still lost work for 7 people though.
 
 Updating to v4.2.0 now. This should have been a mandatory update.
 
@@ -52,7 +52,7 @@ Of course, that only works when you have internet, which doesn't help on a plane
 
 ### Reply 4
 
-**Posted by:** @NimbusDocs_PowerUser | February 10, 2026
+**Posted by:** @ZavaDocs_PowerUser | February 10, 2026
 
 Pro tip: Even in v4.2.0, check the sync status icon in the system tray before you go offline. Green checkmark = all synced. Orange spinner = still syncing. If you close the laptop while it's still syncing, your baseline might be stale and you'll get more conflict copies than necessary.
 
@@ -64,7 +64,7 @@ Also, increase your offline cache size (Settings > Sync > Cache Size) — I set 
 
 **Posted by:** @IT_Manager_Karen | February 12, 2026
 
-For any IT admins reading this — add NimbusDocs Desktop Client to your mandatory update policy. v4.2.0 is a critical update. We pushed it via endpoint management and haven't had a sync complaint since.
+For any IT admins reading this — add ZavaDocs Desktop Client to your mandatory update policy. v4.2.0 is a critical update. We pushed it via endpoint management and haven't had a sync complaint since.
 
 KB-007 has the full guide on offline sync behavior, conflict resolution, and desktop client configuration. Highly recommend reading it.
 

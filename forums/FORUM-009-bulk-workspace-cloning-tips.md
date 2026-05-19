@@ -2,7 +2,7 @@
 
 **Article Number**: FORUM-009  
 **Category**: Data Migration & Templates  
-**Product**: NimbusBoard
+**Product**: ZavaBoard
 
 ---
 
@@ -10,7 +10,7 @@
 
 **Posted by:** @KarenJ_PMO | February 12, 2026
 
-We clone all 200 of our NimbusBoard project workspaces at the start of each quarter for Q+1 planning. This quarter, 73 of 200 failed. Errors were: "workspace exceeds 10,000 cards," "integration clone failed," and "attachment size exceeded." How does everyone else handle bulk cloning without these headaches?
+We clone all 200 of our ZavaBoard project workspaces at the start of each quarter for Q+1 planning. This quarter, 73 of 200 failed. Errors were: "workspace exceeds 10,000 cards," "integration clone failed," and "attachment size exceeded." How does everyone else handle bulk cloning without these headaches?
 
 ---
 
@@ -24,7 +24,7 @@ We clone 150+ workspaces every quarter and here's our pre-clone checklist:
 
 2. **Clone without integrations:** Always uncheck "Automations and rules" during bulk clone. Re-add integrations manually to the new workspace with updated webhook URLs for the new quarter's Slack channels.
 
-3. **Clone without attachments:** Large workspaces have GB of attachments. Clone the structure, then selectively migrate needed files via NimbusVault.
+3. **Clone without attachments:** Large workspaces have GB of attachments. Clone the structure, then selectively migrate needed files via ZavaVault.
 
 4. **Use templates instead of cloning** for workspaces that follow the same structure every quarter. Save the workspace as a template once, create new workspaces from the template.
 
@@ -46,7 +46,7 @@ For the 22 integration failures — cloning without integrations worked. Re-addi
 
 **Posted by:** @AutomationWiz_Nina | February 14, 2026
 
-For the integration re-add problem, here's a trick: Use NimbusBoard's automation **import/export** feature. Before cloning:
+For the integration re-add problem, here's a trick: Use ZavaBoard's automation **import/export** feature. Before cloning:
 
 1. Go to each workspace > Settings > Automations > Export (JSON)
 2. Edit the JSON to update webhook URLs, channel IDs, etc.
@@ -62,7 +62,7 @@ This way you only need to update the JSON file once (find-and-replace URLs) and 
 
 We took a different approach entirely: **workspaces as templates**.
 
-Instead of cloning last quarter's workspace (which accumulates stale cards and outdated automations), we maintain a set of "golden templates" in NimbusAdmin > NimbusBoard > Templates. Each quarter, we create fresh workspaces from templates and migrate only active cards from the previous quarter.
+Instead of cloning last quarter's workspace (which accumulates stale cards and outdated automations), we maintain a set of "golden templates" in ZavaAdmin > ZavaBoard > Templates. Each quarter, we create fresh workspaces from templates and migrate only active cards from the previous quarter.
 
 Yes, it's more work upfront to set up the templates. But zero clone errors ever, and each new quarter starts clean.
 
@@ -87,4 +87,4 @@ KB-009 has the complete guide to workspace cloning and migration. Thanks everyon
 
 **Posted by:** @NewPM_Jessica | February 20, 2026
 
-Just a heads-up for anyone on the NimbusCloud Business plan — the bulk clone feature has a limit of 200 workspaces per job. If you need more, split into multiple jobs. Also, run bulk clones during off-peak hours — our 200-workspace clone took about 25 minutes on a Saturday morning vs. 90 minutes on a Tuesday afternoon.
+Just a heads-up for anyone on the ZavaCloud Business plan — the bulk clone feature has a limit of 200 workspaces per job. If you need more, split into multiple jobs. Also, run bulk clones during off-peak hours — our 200-workspace clone took about 25 minutes on a Saturday morning vs. 90 minutes on a Tuesday afternoon.
